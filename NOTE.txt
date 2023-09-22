@@ -4,6 +4,9 @@ use exploit/multi/handler
 gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
 [directory bruteforce]
 
+subfinder -d (target_site)
+[sub domain enumeration]
+
 sublist3r -d (sitename.com)
 [search for sub domain]
 
@@ -71,4 +74,29 @@ sudo openvpn nmap -sV {target IP}
 
 </whatever tag><whatever tag>alert(1)</whatever tag>
 [backlash and closing tag escape]
+
+weevly generate (any_pass) /storage_path/file_name
+[generate php shell]
+
+
+*******************************
+****INFORMATION GATHERING******
+
+whoislookup
+[site to check url IP]
+
+netcraft
+[site to view url devices]
+
+robtex.com
+[site to analyse DNS record]
+
+git clone https://github.com/guelfoweb/knock.git
+[subdomain enumeration]
+
+subfinder -d (target_site)
+[sub domain enumeration]
+
+[+] look for robot.txt files and open 
+
 
