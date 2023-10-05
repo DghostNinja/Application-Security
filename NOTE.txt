@@ -111,9 +111,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - sqlmap -u "url" --columns -T (desired_column) -D (db_name)  --open column
 - sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
 - 
-
+[+] Change admin GET request to true and foward for cookies manipulation -- Broken Access Control
+[+] Copy a user ID to view another users sensitive information/ create 2 accounts
+[+] Test user ID section with "administrator/admin" and view value parameter for hashed password
 [+] 
-
 
 *******************************
 ****INFORMATION GATHERING******
@@ -132,6 +133,13 @@ git clone https://github.com/guelfoweb/knock.git
 
 subfinder -d (target_site)
 [sub domain enumeration]
+
+dirb
+
+gobuster
+
+theHarvest -d (url) -l 500 -b (where to check)
+[harvest site email]
 
 [+] look for robot.txt files and open 
 
