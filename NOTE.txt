@@ -88,7 +88,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [redirect]
 
 400
-[ ]
+[Bad Request]
 
 #DIR ENUMERATION/INFORMATION DISCLOSURE 
 [+] look for robots.txt files and open -- Information disclosure
@@ -141,8 +141,15 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1 
 - copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure 
 
-#PATH/DIR TRIVERSAL
+-PATH/DIR TRIVERSAL
+[+] Test if you can load images/pages by manipulating endpoint with "=" sign 
+- change enpoint request to "/etc/passwd" 
+[+] use "../etc/passwd" as much as possible till file loads if vuln
+[+] if "../etc" is being filtered try a null byte "../../../etc/passwd%00.jpg"
+[+] if "../" is stripped try doubling your forward characters by "....//....//....//etc/passwd"
+[+] for file path traversal try going back to root dir and gaing passwd by entering "../../../etc/passwd" infront of "/var/www/whatever" 
 [+] 
+
 
 *******************************
 ****INFORMATION GATHERING******
