@@ -148,8 +148,14 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] if "../etc" is being filtered try a null byte "../../../etc/passwd%00.jpg"
 [+] if "../" is stripped try doubling your forward characters by "....//....//....//etc/passwd"
 [+] for file path traversal try going back to root dir and gaing passwd by entering "../../../etc/passwd" infront of "/var/www/whatever" 
+[+] if "/" is filtered out in "../etc" use url encode "..%2fect"
+- if it doesn't work, double the url encode all character on "/"
+[+] send request to intruder, clear $ sign, add your end point to $ sign
+- paste payload in intuder payload and auto start traversal attack --to automate dir/Path traversal
 [+] 
 
+#CSRF
+[+]
 
 *******************************
 ****INFORMATION GATHERING******
