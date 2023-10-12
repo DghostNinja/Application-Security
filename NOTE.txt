@@ -85,10 +85,16 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [OK]
 
 300
-[redirect]
+[redirect/success]
 
 400
 [Bad Request]
+
+#BYPASS A 404
+[+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
+- load url with target extension and "Do intercept" then forward
+- when you hit a redirect back to login page, change the "302 Found" to "200 ok" 
+- 
 
 #DIR ENUMERATION/INFORMATION DISCLOSURE 
 [+] look for robots.txt files and open -- Information disclosure
@@ -160,6 +166,21 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - load up file on web browser, try update email/password from there
 - check back on main site if request  was forged 
 [+] clear token value in element "value" section if its doesn't work 
+
+#OAuth
+[+] create 2 accounts, monitor the HTTP history containing the "/authenticate"
+- change the login details on the column that has an OAuth Token
+- click on request in broswer, original session, then copy modified url --reuse an access token
+[+] Login to your account and link socials
+- obtain OAuth code and drop packets to aviod the code from expiring 
+- log out of the account and deliver Oauth URL in "iframe" as exploit, you should have access to admin
+[+] logout and login to account to see if the Oauth cookies work
+- copy the callback && redirect OAuth url in burp history and paste into an html iframe, deliver to target
+- check site access logs for admin Oauth code 
+- copy url containing OAuth code and replace the code with the new admin code
+- paste url in browser you should be logged in as admin
+
+
 
 *******************************
 ****INFORMATION GATHERING******
