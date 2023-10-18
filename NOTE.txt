@@ -198,7 +198,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] Use {';alert(5);//} in comment/serach section  --break out of a JS code
 [+] Manipulate store ID and check where you got trapped 
 [-] paste XSS in url when trapped in the ID or select tag
-[+] 
+[+] Use Wappalyzer to cehck site Library
+[+] Bypaas back tick "${alert(2)}"
+[+] Escape backward slash with {\';alert(5);//}
+
 
 *******************************
 ****INFORMATION GATHERING******
