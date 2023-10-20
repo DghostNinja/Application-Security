@@ -96,6 +96,9 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 400
 [Bad Request]
 
+#OPEN REDIRECT
+[+] Add “domain_name=any_url" at the end of redirecting URL
+
 #BYPASS A 404
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
 - load url with target extension and "Do intercept" then forward
