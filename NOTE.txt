@@ -7,6 +7,12 @@ https://hackersonlineclub.com/command-injection-cheatsheet/
 https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
 [XSS Cheat]
 
+knockpy -u (url) --no-local
+[quick subdomain enum]
+
+dirsearch -u 
+[directory busting]
+
 gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
 [directory bruteforce]
 
@@ -255,6 +261,9 @@ gobuster
 
 knockpy
 [enum/probe]
+
+dirsearch
+[enum]
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
