@@ -143,10 +143,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - 
 
 #BAC
-[+] Change admin GET request to true and foward for cookies manipulation -- Broken Access Control
+[+] Change admin GET request to true and foward for cookies manipulation/ change admin value to true on match & replace -- Broken Access Control
 - Copy a user ID to view another users sensitive information/ create 2 accounts
 - Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
-- Test the live chat section by forwarding txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
+- Test the live chat section by forwarding VIEW TRANSCIPT txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
 [+] Intercept email update on user profile
 -forward to repeater, get a RESPONSE to view "role ID"
 -add "," and enter new line in REQUEST then paste "role ID = " 
@@ -154,7 +154,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [+] Test URL by entering "/admin" 
 - intercerpt and reload "/admin" error messages
 - if there"s no param to show you're not admin foward packets again to checek useful info
-- if ther's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
+- if there's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
 - turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1 
 - copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure 
 
@@ -205,19 +205,19 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - or {"onload=alert(2)} into search bar
 [+] Use {';alert(5);//} in comment/serach section  --break out of a JS code
 [+] Manipulate store ID and check where you got trapped 
-[-] paste XSS in url when trapped in the ID or select tag
+- paste XSS in url when trapped in the ID or SELECT tag
 [+] Use Wappalyzer to cehck site Library
 [+] Bypaas back tick "${alert(2)}"
 [+] Escape backward slash with {\';alert(5);//}
 [+] Escape href tag parameter ');, add {alert(8);//');} behinde website url in WEBSITE adding field
-[-] if the WA adds a backward slash to counter, add a backward slash to the url e.g "https://google.com\');alert(8);//"
-[-] if program filter single quote change to encoding e.g "https://google.com&apos;);alert(8);//" --stored XSS into oneclick event 
+- if the WA adds a backward slash to counter, add a backward slash to the url e.g "https://google.com\');alert(8);//"
+- if program filter single quote change to encoding e.g "https://google.com&apos;);alert(8);//" --stored XSS into oneclick event 
 [+] if all HTML tags are blocked use a non-working tag to test the search then input "<bkk onfocus=alert(8) tabindex=1>blog<\bkk>" to treat the tag as an element
-[-] if attribute is not allowed, forward the test search to intuder, clear the word tested in the POSITION and add "<$$>"
-[-] copy and paste all possible html tag into PAYLOAD section and start attack
-[-] use/test the tag with a 200 ok
-[-] add the working tag to the POSITION with url encoding of SPACE e.g "serach=<body%20$$>", paste possible JS events into PAYLOADS and start atatck
-[-] use JS event that work with accepted HTML tag
+- if attribute is not allowed, forward the test search to intuder, clear the word tested in the POSITION and add "<$$>"
+- copy and paste all possible html tag into PAYLOAD section and start attack
+- use/test the tag with a 200 ok
+- add the working tag to the POSITION with url encoding of SPACE e.g "serach=<body%20$$>", paste possible JS events into PAYLOADS and start atatck
+- use JS event that work with accepted HTML tag
 
 
 *******************************
@@ -248,13 +248,13 @@ httpx
 [probe]
 
 dirb
-[enum]
+[dir enum]
 
 gobuster
 [enum]
 
 knockpy
-[enum]
+[enum/probe]
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
