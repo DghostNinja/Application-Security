@@ -211,6 +211,7 @@ sudo openvpn nmap -sV {target IP}
 - or use "||sleep+5||"
 
 #XSS
+[+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload 
 [+] Test site with html injection tags e.g <b>test<b> beforre inputting XSS
 [+] Scope: test COMMENTS, FEEDBACKS, CHECK STOCK & SEARCH 
 [+] Check the string or parameter you are entrapped by inspecting webpage
