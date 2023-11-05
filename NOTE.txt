@@ -7,7 +7,7 @@ https://hackersonlineclub.com/command-injection-cheatsheet/
 https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
 [XSS Cheat]
 
-knockpy -u (url) --no-local -o (.txt) --no-http 500 404 306
+knockpy -u (url) --no-local -o (.txt) --no-http-code 500 404 306
 [quick subdomain enum]
 
 dirsearch -u (url) -o (.txt)
@@ -106,6 +106,10 @@ sudo openvpn nmap -sV {target IP}
 
 400
 [Bad Request]
+
+#BLANK PAGE 
+[+] intercept response and check for token in header
+- pass token into dir enumeration to show more directories 
 
 #OPEN REDIRECT
 [+] Add “domain_name=any_url" at the end of redirecting URL
@@ -235,7 +239,7 @@ sudo openvpn nmap -sV {target IP}
 - use JS event that work with accepted HTML tag
 [+] Intercept XSS request and FORWARD it till you get a POST request 
 - add "&token=sss" in URL to see where it is being injected in site 
-- mark option to intercept resonse in proxy 
+- mark option to intercept response in proxy 
 - add {;script-src-elem 'unsafe-inline'} to URL containing XSS and paste in browser --CSP token
 
 
@@ -276,7 +280,7 @@ knockpy
 [enum/probe]
 
 dirsearch
-[enum]
+[dir enum]
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
