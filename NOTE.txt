@@ -164,7 +164,7 @@ sudo openvpn nmap -sV {target IP}
 - {'+union+select+username,password+from+users+where+username='administrator'--} --select password belonging to a specific user
 
 **BLIND SQLi**
-[+] 
+[+] test request cookies tracking ID with a FALSE statement and note changes
 
 
 [+] test login with {'} if internal error shows then it allows SQLi
