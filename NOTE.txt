@@ -128,7 +128,7 @@ sudo openvpn nmap -sV {target IP}
 [+] if url redirects to a login page use “checkout_url=.attacker.com" at the end of main URL
 
 #BYPASS A 404
-[+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
+[+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (exentension e.g php)
 - load url with target extension and "Do intercept" then forward
 - when you hit a redirect back to login page, change the "302 Found" to "200 ok" 
 - 
