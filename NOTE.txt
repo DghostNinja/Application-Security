@@ -1,3 +1,5 @@
+ls -la
+
 use exploit/multi/handler
 [listen to port connection...set LHOST and LPORT]
 
@@ -109,6 +111,13 @@ sudo openvpn nmap -sV {target IP}
 
 400
 [Bad Request]
+
+#LFI
+[+] intercept download file and check if file path before endpoint is in '.php?'
+- clear and use "../etc/passwd/" in endpoint to check http status code
+[+] Bypass WAF with "../index.php" and if 200 OK appears use ffuf
+- (ffuf -u ""url_to_download_path_endpoint=../FUZZ.php"" -w (seclist_medium_dir.txt) 
+- copy link address with 200 ok you should see src codes 
 
 #BLANK PAGE 
 [+] intercept response and check for token in header
