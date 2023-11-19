@@ -194,7 +194,7 @@ sudo openvpn nmap -sV {target IP}
 [+] test url endpoints
 
 #BAC
-[+] Change admin GET request to true and foward for cookies manipulation/ change admin value to true on match & replace -- Broken Access Control
+[+] Change admin GET request to true and forward for cookies manipulation/ change admin value to true on match & replace -- Broken Access Control
 - Copy a user ID to view another users sensitive information/ create 2 accounts
 - Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
 - Test the live chat section by forwarding VIEW TRANSCIPT txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
@@ -211,14 +211,14 @@ sudo openvpn nmap -sV {target IP}
 
 -PATH/DIR TRIVERSAL
 [+] Test if you can load images/pages by manipulating endpoint with "=" sign 
-- change enpoint request to "/etc/passwd" 
+- change endpoint request to "/etc/passwd" 
 [+] use "../etc/passwd" as much as possible till file loads if vuln
 [+] if "../etc" is being filtered try a null byte "../../../etc/passwd%00.jpg"
 [+] if "../" is stripped try doubling your forward characters by "....//....//....//etc/passwd"
 [+] for file path traversal try going back to root dir and gaing passwd by entering "../../../etc/passwd" infront of "/var/www/whatever" 
 [+] if "/" is filtered out in "../etc" use url encode "..%2fect"
 - if it doesn't work, double the url encode all character on "/"
-[+] send request to intruder, clear $ sign, add your end point to $ sign
+[+] send request to intruder, clear $ signs, add your specific end point to $ sign
 - paste payload in intuder payload and auto start traversal attack --to automate dir/Path traversal
 [+] 
 
@@ -261,7 +261,7 @@ sudo openvpn nmap -sV {target IP}
 [+] Use Wappalyzer to cehck site Library
 [+] Bypaas back tick "${alert(2)}"
 [+] Escape backward slash with {\';alert(5);//}
-[+] Escape href tag parameter ');, add {alert(8);//');} behinde website url in WEBSITE adding field
+[+] Escape href tag parameter ');, add {alert(8);//');} behind website url in WEBSITE adding field
 - if the WA adds a backward slash to counter, add a backward slash to the url e.g "https://google.com\');alert(8);//"
 - if program filter single quote change to encoding e.g "https://google.com&apos;);alert(8);//" --stored XSS into oneclick event 
 [+] if all HTML tags are blocked use a non-working tag to test the search then input "<bkk onfocus=alert(8) tabindex=1>blog<\bkk>" to treat the tag as an element
