@@ -1,5 +1,19 @@
 ls -la
 
+nmap -sV (IP)
+nmap --script vuln (IP)
+
+nikto -host (IP)
+
+nslookup (sitename)
+host (sitename)
+whois (sitename)
+whatweb (site_IP)
+
+
+"@site_name" -site:site_name
+[google dorking site email]
+
 use exploit/multi/handler
 [listen to port connection...set LHOST and LPORT]
 
@@ -12,7 +26,7 @@ https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
 https://portswigger.net/web-security/sql-injection/cheat-sheet
 [SQL cheat sheet]
 
-knockpy -u (url) --no-local -o (.txt) --no-http-code 500 404 306
+knockpy (url.com) --no-local -o (.txt) --no-http-code 500 404 306
 [quick subdomain enum]
 
 dirsearch -u (url) -o (.txt)
@@ -317,6 +331,9 @@ dirsearch
 
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
+
+Nikto
+[ ]
 
 [+] look for robot.txt files and open 
 
