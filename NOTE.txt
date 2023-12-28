@@ -1,4 +1,5 @@
 ls -la
+ls | grep <file_name>
 
 nmap -sV (IP)
 nmap --script vuln (IP)
@@ -327,8 +328,11 @@ sudo openvpn nmap -sV {target IP}
 [+] Test "check stock" option 
 - decode the URL and check where the IP hosting the web server, test the IP by changing its value 
 - send request to intruder, clear $ signs, add $last_no_in_IP$ 
-- PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1
-- 
+- PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1, start attack 
+- note the page that throws a "404" 
+- send the 404 request to repeater and test with a web dir e.g (/admin)
+- copy url to delete or access files, paste in stockAPI, encode and send request --Basic SSRF against another back-end system
+[+] 
 
 
 
