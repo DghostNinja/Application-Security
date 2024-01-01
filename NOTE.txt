@@ -332,8 +332,10 @@ sudo openvpn nmap -sV {target IP}
 - note the page that throws a "404" 
 - send the 404 request to repeater and test with a web dir e.g (/admin)
 - copy url to delete or access files, paste in stockAPI, encode and send request --Basic SSRF against another back-end system
-[+] 
-
+[+] you can Capitalize few letters in the "//localhost/" or refer to the IP of the local "127.0.0.1" 
+- you can also double "url encode all characters" in the <"//localhost">
+- you can capitalize a part of the directory you want to gain access into e.g <"/aDmin"> --SSRF with blacklist-based filter
+[+] -- Bypass whitelist 
 
 
 
