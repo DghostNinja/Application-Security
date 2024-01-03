@@ -333,11 +333,28 @@ sudo openvpn nmap -sV {target IP}
 - send the 404 request to repeater and test with a web dir e.g (/admin)
 - copy url to delete or access files, paste in stockAPI, encode and send request --Basic SSRF against another back-end system
 [+] you can Capitalize few letters in the "//localhost/" or refer to the IP of the local "127.0.0.1" 
-- you can also double "url encode all characters" in the <"//localhost">
-- you can capitalize a part of the directory you want to gain access into e.g <"/aDmin"> --SSRF with blacklist-based filter
-[+] -- Bypass whitelist 
+- you can also double "url encode all characters" in the <"localhost">
+- you can capitalize a part of the directory you want to gain access into e.g <"/aDmin">  --SSRF with blacklist-based filter
+[+] load stockAPI against localhost and check if the error message directs you to any external site
+- send request to that site with an "@" symbol infront e.g <http://@stock.com/>
+- if still whitelisted, access local host with authority symbol and url e.g <http://localhost?@stock.com>
+- do not forget to double url encode "?" 
+- enter the web dir you want by pasting url into stockapi  --Bypass whitelist 
+[+] check stock and see if there is an option for NEXT PRODUCT
+- separetely load up the next product and try to see if it allows open redirect, test with <&path=https:google.com>
+- copy the url and path of the next product and paste in the checkstock own
+- replace the stockAPI url to that of product on a next page then add <&path=http://localhost/>
+- if an error message occur then try removing the domain and current page ID, leaving only the product dir and redirect path OR
+- URL encode key characters -- SSRF with filter bypass via open redirection vulnerability
 
-
+#BLIND SSRF 
+[+] Test the view product section by intercepting to see if there is "Referer server address"
+- copy and paste referer address to BURP COLLABORATOR and pull request
+- copy collaborator payload and replace in the referer address
+- forward request and pull request to see requests sent  
+- check for "user agent  serever exploit(shellshock)" on google  -- Blind SSRF with Shellshock exploitation
+// this method is for PRO version of Burp suite
+[+] 
 
 *******************************
 ****INFORMATION GATHERING******
