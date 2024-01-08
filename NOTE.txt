@@ -146,7 +146,10 @@ sudo openvpn nmap -sV {target IP}
 #OPEN REDIRECT
 [+] Add “domain_name=any_url" at the end of redirecting URL
 [+] if url redirects to a login page use “checkout_url=.attacker.com" at the end of main URL
-
+[+] try <?returnUrl=https://bbnbnbn.com>
+[+] if there's is a "type=0" in redirect and site is locating url in header, change to "type=1"
+[+] 
+s
 #BYPASS A 404
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
 - load url with target extension and "Do intercept" then forward
@@ -428,4 +431,8 @@ Nikto
 
 [+] look for robot.txt files and open 
 
-
+TEST
+https://www.bugbountytraining.com/fastfoodhackings/admin.php
+https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1
+https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
+https://www.bugbountytraining.com/fastfoodhackings/index.php?act=logintesttest
