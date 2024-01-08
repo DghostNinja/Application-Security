@@ -427,11 +427,10 @@ zap
 [web analysis]
 
 Nikto
-[ ]
-
-[+] look for robot.txt files and open 
+[ ] 
 
 TEST
+[+] look for robot.txt files and open each dir to see which ever one redirects or responds  
 https://www.bugbountytraining.com/fastfoodhackings/admin.php
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
