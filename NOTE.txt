@@ -436,8 +436,8 @@ https://www.bugbountytraining.com/fastfoodhackings/admin.php
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
 
-#perform HTML injection in url field
+#Perform HTML injection in url field && Escalate to XSS
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=logintesttest
 [+] add a random word to the login e.g <testtest>
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttest
-[+] check if test reflects in page, try to bold it to be sure
+[+] check if test reflects in page, try to bold it to be sure e.g {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><b>logintestest</b>}
