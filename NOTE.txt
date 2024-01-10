@@ -443,6 +443,9 @@ https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttes
 - if HTML injection reflects, replace injection with an XSS & and leave the last HTML tag open because of the comment "-->" {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><script>alert(3)</script}
 - if you're stil getting filtered try a tag that does not need to be closed e.g "img" and leave the end > open {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><img src=x onerror=alert(2)}
 
-#Manipulate number specific date picker 
-[+]
-- 
+#Manipulate number specific date picker in booking section 
+[+]Enter test details like a real user and inrecept booking with burp
+- check the filled details in burp request, closeand end each filled in parameter with {"><script>alert(2)</script>}
+- foward request
+- you can also test each filled parameter one after the other o run each on intruder
+
