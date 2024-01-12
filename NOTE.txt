@@ -434,6 +434,10 @@ TEST
 https://www.bugbountytraining.com/fastfoodhackings/admin.php
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
+/fastfoodhackings/api/admin.php?adToken= 
+ {"username":"test-zseano","password":"SuP3RG0OdP@ssw0rd!"}
+
+
 
 #Perform HTML injection in url field && Escalate to XSS
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=logintesttest
@@ -454,3 +458,15 @@ https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttes
 - check the order_ID if it ends with "=" then its in base64, decode base64
 - manipulate and base64 encode order number to see if you can load another order
 - if it loads another users data then you have Broken Access Control 
+
+#Others 
+[+] load menue page and intercerpt, keep forwarding requests till you find a juicy directory e.g (/menue)
+[+] load "/admin" from the diredctory gotten on robot.txt in the menue URL
+- if you're denied access, intercept request and forward to see a "addToken" in url request 
+- search the "adToken=" in TARGET to see the Token needed for admin access 
+- paste the URL dir in the search bar witth scope website and load 
+// you can also use the target to check for other directories an endpoint is leading to e.g (f=) then search 
+// Regex in burp: {\?.*?=}
+#BAC 
+[+] when you get to loginn with any credential, try load anotther user by changing ID 
+-
