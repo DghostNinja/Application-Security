@@ -148,7 +148,7 @@ sudo openvpn nmap -sV {target IP}
 [+] if url redirects to a login page use “checkout_url=.attacker.com" at the end of main URL
 [+] try <?returnUrl=https://bbnbnbn.com>
 [+] if there's is a "type=0" in redirect and site is locating url in header, change to "type=1"
-[+] 
+[+] https://....../index.php?from=test&type=1#redir=https://google.com
 s
 #BYPASS A 404
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
@@ -429,6 +429,10 @@ zap
 Nikto
 [ ] 
 
+LazySec chrome extension 
+[show hidden element on webpage]
+
+
 TEST
 [+] look for robot.txt files and open each dir to see which ever one redirects or responds  
 https://www.bugbountytraining.com/fastfoodhackings/admin.php
@@ -478,4 +482,17 @@ https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttes
 - for the above site, it redirects and reflects in the source code of the menu.php path
 - input payload on book.php?promoCode=<UKONLY';aalertlert(2);var x='a}
 - load the Menu page and you should have a stored XSS 
+
+#Open redirect with LazySec
+[+] use Lazysec to show hidden parameters on login form page
+- check its href functionality and try manipulate where site redirects to 
+- check TARGET to search for the redirect functionality in site and check what parameter is used to get request e.g (from)
+- use <?from=https://google.com as test>, click on link and if it redirects report your vulnerability
+[+] {https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=https://google.com} as seen from TARGET param field
+// you can also inject RXSS in the href straight from the search bar e.g {https://www.bugbountytraining.com/fastfoodhackings/index.php?from=javascript:alert(3)}
+- click on login and the link from earlier that gave Open redirect
+OR
+https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=javascript:alert(3)
+
+
 
