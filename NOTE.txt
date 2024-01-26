@@ -1,3 +1,7 @@
+ngrok http <specify port>
+python3 -m http.server <server_port>
+[start ngrok]
+
 ls -la
 ls | grep <file_name>
 
