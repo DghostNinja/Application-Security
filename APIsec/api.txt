@@ -1,0 +1,138 @@
+- DAST - Dynamic Application Security Testing
+    - Involves after production testing which is mostly black box with tools like ZAP, acunetix, veracode and gitlab
+- SAST - Static Application Security Testing
+    - Involves code review before launch which is mostly white box with tools like veracode, fortify, Synk, Checkmarx
+- CI/CD - Continuous Integration and continuous Delivery or Deployment
+
+# Gitlab integration
+
+- Proxy based DAST - simple website technology like HTML and CSS
+- Browser based analyzer - heavily based on JavaScript
+- API DAST analyzer - testing APIs
+
+---
+
+- Machine-readable documentation is designed to be processed by software for automating tasks like API integration and validation. It's written in structured formats like JSON or XML.
+
+[+] API documentation, for example:
+
+- /api
+/swagger/index.html
+/openapi.json
+- test for each parameter by gradually deleting the path
+
+[+] investigate how the API responds to changing the HTTP method and media type.
+
+- GET - Retrieves data from a resource.
+- PATCH - Applies partial changes to a resource.
+- OPTIONS - Retrieves information on the types of request methods that can be used on a resource.
+
+[+]  Take advantage of differences in processing logic. For example, an API may be secure when handling JSON data but susceptible to injection attacks when dealing with XML.
+
+- To change the content type, modify the Content-Type header
+
+[+] intercept and click on a product and get the API endpoint from HTTP history.
+
+- Change the GET to PATCH
+- Add Content-Type: application/json and a JSON price to the body
+
+```json
+Content-Type: application/json
+
+{
+"price":0
+}
+```
+
+- Forward request
+
+[+] Mass assignment vulnerabilities (also known as auto-binding):  can inadvertently create hidden parameters. It occurs when software frameworks automatically bind request parameters to fields on an internal object. 
+
+[+] Identifying hidden parameters: 
+
+- test any boolean (TRUE/FALSE) value on the API request
+- read through JSON and compare request and responses
+
+[+] Prevention of API hacks
+
+- Secure your documentation if you don't intend your API to be publicly accessible.
+- Ensure your documentation is kept up to date so that legitimate testers have full visibility of the API's attack surface.
+- Apply an allowlist of permitted HTTP methods.
+- Validate that the content type is expected for each request or response.
+- Use generic error messages to avoid giving away information that may be useful for an attacker.
+- Use protective measures on all versions of your API, not just the current production version.
+
+# Server-side parameter pollution:
+
+[+] Server-side parameter pollution ( HTTP parameter pollution): Server-side parameter pollution occurs when a website embeds user input in a server-side request to an internal API without adequate encoding. 
+
+[+] To test for server-side parameter pollution in the query string, place query syntax characters like #, &, and = in your input and observe how the application responds.
+
+- Truncating query strings: You can use a URL-encoded # character to attempt to truncate the server-side request.
+- Injecting valid parameters: You can use an URL-encoded & character to attempt to add a second parameter to the server-side request.
+- This varies across different web technologies. For example:
+- PHP parses the last parameter only. This would result in a user search for carlos.
+- [ASP.NET](http://asp.net/) combines both parameters. This would result in a user search for peter,carlos, which might result in an Invalid username error message.
+- Node.js / express parses the first parameter only. This would result in a user search for peter, giving an unchanged result.
+
+```graphql
+GET /userSearch?name=peter%26foo=xyz&back=/home
+```
+
+- test server side request with <&x=y#> make sure you truncate
+
+[+] enter a user name<e.g administrator> and request for password reset 
+
+- Test and bruteforce the <&x=y#>
+- Replace the x with field and bruteforce the y with lists of Server-side list payloads <id, email, username, text …..>
+- Replace the y with a server side word that came back as 200OK
+- Read through the static/forget-assword.js file if one is present and check for what ?forget_password is equal to
+- If you find it equal to <rest_token> add it to
+
+```graphql
+username=administrator%23field=resest_token%23>
+```
+
+- Send the request and you should get a paswd reset token for administrator account
+- Past in front of URL <forget_password?reset_token=123….>
+- Reset the password
+
+[Server-side parameter Pollution/Password reset]
+
+# Testing for server-side parameter pollution in REST paths
+
+[+] A RESTful API may place parameter names and values in the URL path, rather than the query string
+
+```graphql
+/api/users/123
+```
+
+- To test for this vulnerability, add path traversal sequences to modify parameters and observe how the application responds <URL-encoded peter/../admin>
+- Navigate to the API definition: ——>
+- test url parameter with <../../../../%23> OR <../../../../openapi.json%23> and notice the error message: ———>
+- /api/internal/v1/users/{username}/field/{field}
+
+Notice that this endpoint indicates that the URL path includes a parameter called field.
+
+- add <username=administrator/field/foo%23> to the parameter path again. You should be corrected on the right server-side parameter to use if wrong or you can bruteforce it
+- In Proxy > HTTP history, review the /static/js/forgotPassword.js JavaScript file. Identify the password reset endpoint, which refers to the passwordResetToken parameter: </forgot-password?passwordResetToken=${resetToken}>
+- from error message you should get api endpoint add it <=../../v1/users/administrator/field/passwordResetToken%23> to parameter
+- get password rest token from response after forwarding URL
+- add <forgetpasswordpasswordResetToken=w0fcc3lrbdicm6mgb5xgrrn59l128dqw> to URL on browser and try to reset password.
+
+# Testing for server-side parameter pollution in structured data formats
+
+[+] To test for this, inject unexpected structured data into user inputs and see how the server responds.
+
+- You can attempt to add the access_level parameter to the request
+
+```graphql
+POST /myaccount
+{"name": "peter\",\"access_level\":\"administrator"}
+```
+
+- this may result in the user peter being given administrator access.
+
+# Testing with automated tools
+
+[+]
