@@ -49,12 +49,10 @@ Content-Type: application/json
 [+] Mass assignment vulnerabilities (also known as auto-binding):  can inadvertently create hidden parameters. It occurs when software frameworks automatically bind request parameters to fields on an internal object. 
 
 [+] Identifying hidden parameters: 
-
 - test any boolean (TRUE/FALSE) value on the API request
 - read through JSON and compare request and responses
 
 [+] Prevention of API hacks
-
 - Secure your documentation if you don't intend your API to be publicly accessible.
 - Ensure your documentation is kept up to date so that legitimate testers have full visibility of the API's attack surface.
 - Apply an allowlist of permitted HTTP methods.
@@ -135,4 +133,10 @@ POST /myaccount
 
 # Testing with automated tools
 
-[+]
+[+] You can also use the Backslash Powered Scanner BApp to identify server-side injection vulnerabilities
+
+- Burp Scanner automatically detects suspicious input transformations when performing an audit. Then do a manual  check
+
+# Preventing server-side parameter pollution
+
+[+] To prevent server-side parameter pollution, use an allowlist to define characters that don't need encoding, and make sure all other user input is encoded before it's included in a server-side request. You should also make sure that all input adheres to the expected format and structure.
