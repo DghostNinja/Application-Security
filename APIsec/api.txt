@@ -156,6 +156,10 @@ https://target.domain/docs
 
 https://target.domain/rest
 
+[+] https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+
+[API TOP 10]
+
 # API1:2023 Broken Object Level Authorization (BOLA)
 
 - The most damaging of the API top 10. It involves manipulating IDs and gaining access to records that do not belong to you, leading to data loss, manipulation and disclosure.
@@ -224,8 +228,104 @@ PUT /accountAuthorization: Bearer <token>
 - Implement anti-brute force mechanisms to mitigate credential stuffing, dictionary attacks, and brute force attacks on your authentication endpoints
 - Implement continuous testing to make sure no changes are creeping into code logic or into the infrastructure that may be exposing new authentication vulnerabilities.
 
-# API3:2023 Broken Object Property Level Authorization
+# Types of API
+
+- Public API
+- Private API
+- Partner API
+- Composite API
+
+# 3 Pillars of API Security are Governance, Testing and Monitoring (GTM)
+
+# API PENETRATION TESTING
+
+RECON:
+
+- PASSIVE RECON:
+
+[+] intitle:"api" site:"WEBSITE[.com](http://coinbase.com/)"
+
+[+] inurl:"/api/v1" site:"website[.com](http://coinbase.com/)"
+
+[+] intitle:json site:"website[.com](http://microsoft.com/)"
+
+[+] use github search
+
+# Software lifecycle:{Application Security}
+
+# SDLC (SOFTWARE DEVELOPMENT LIFECYCLE)
+
+[+] Includes 6-8 stages which are;
+
+- Planning - allocation of materials needed
+- Requirement definition - SRS (SOFTWARE REQUIREMENT SPECIFICATION)
+- Design and Prototyping - what the interface would look like and what features to be added, templates. Architecture Design Review (ARD)  comes in
+- Software development - code is written and documented.
+- Testing - QA, Test case design and development, test environment set up and test execution.
+- Deployment - Popular Software Deployment tools are Netlify and Argo CD.
+- Operation and Maintenance
+
+# CALMS:
+
+[+] It's a framework that assesses a company's ability to adopt DevOps processes.
+
+- Culture - culture shift with an organization for security approach by adoption or bringing in new method
+- Automation
+- Lean - breaking down tasks as small as possible and creating initial version (beta) to be delivered to users instead of waiting to perfect the software
+- Measurement - a list of metrics to record and apply changes or features from Beta feedbacks to better the software
+- Sharing - sharing of responsibility during the SDLC for improve the software.
+
+# DevOps metrics:
+
+Brooke's Law : Adding human resources to a late software project will make it later
+
+[+] Deployment speed and Frequency are used to measure deployment agility.
+
+- MTTP (Meantime To Production) - length of time between when a code CHANGE is committed and when it's in deployed state. Shorter MTTP is what we need.
+- Failure Rate - involves major fixes that comes after a code change. Tracking and reporting failure rates are essential for ensuring new code releases meet security requirements
+- Deployment Frequency - measurements of time  a code/software is released into pre-production staging environment
+- MTTR (Meantime To Recovery) - measurements or average length in time when an error occurs in production stage. If a failure occurs, a fix must be deployed as soon as possible, or the changes that caused the failure must be rolled back
+- Communicating risk
+
+# SSDLC (Secure Software Development Lifecycle)
+
+[+] Secure SDLC involves instilling security processes at all lifecycle phases. From security testing tools to writing security requirements alongside functional requirements.
+
+[+] SSDLC Processes;
+
+- Risk Assessment - security considerations, functionalities and requirements. Includes factors like WORST CASE SCENARIO. Best done in early stage of SDLC
+    - Qualitative Risk Assessment: it is commonly found in companies and involves grading severity of risk. (Risk = Severity X Likelihood
+    - Quantitative Risk Assessment: used to measure risk Severity in numerical value.
+- Threat modeling - identification of potential threat where safe guarding is needed. Best don in the design phase before any code is written. Prioritizing techniques to mitigate attacks. Methodologies include;
+    - STRIDE(Spoofing, Tampering, Repudiation, Information Disclosure, Denial Of Service, and Elevation/Escalation of Privilege): Built on principles of the CIA triad. Security professionals that perform STRIDE are looking to answer "What could go wrong with this system".
+    - DREAD(Damage Potential, Reproducibility, Exploitability, Affected Users and Discoverability): it's a model that ranks threat by assigning the threats according to their severity and priority
+    - PASTA(Process for Attack Simulation and Threat Analysis): involves the threat modelling process from analysing threats to finding ways to mitigate them, but on a more strategic level and from an attacker's perspective. Divided into 7 stages;
+        - Define objective - nothing structures
+        - Define technical scope - architectural structures are defined
+        - Decomposition & Analysis - mapping threat vector
+        - Threat Analysis - identifying which application is vulnerable to certain threat vectors
+        - Vulnerabilities & Weaknesses Analysis - identifies and enumerates security flaws in applications
+        - Attack/Exploit Enumeration & Modelling - identifying potential risks or threats
+        - Risk Impact Analysis - contains steps to mitigate and eliminate risks
+- Code scanning/Review - SAST & DAST - synk, sonarqube, jira, gitlab
+    - Mobile: MobSF, Jadx and Apktool | appetiz/Andriod studio for mobile DAST
+    - SAST : Static because the test is done before an application is live and running.  Also contains SCA (Software Composition Analysis) . It is white box
+    - DAST: it does not access to application’s source code. it is Black box
+    - IAST: testing and analyzing code for vulnerabilities while the app is running. It is Grey box. Involves the RASP (Runtime Application Security Protection) analysis the inward and outward traffic behavior of users
+- Security Assessment - involves VA & PT. They test for holistic point of view of Applications so they're carried out at the end of SDLC
+
+# Methodologies in SSDLC:
+
+- Microsoft SDL:
+    - Secure by Design
+    - Secure by Default
+    - Secure by Deployment
+    - Communication
+- OWASP SSDLC - done by following Agile security approach where Sprints are dedicated to security. Involves the Software Assurance Maturity Model (SAMM)
+    - Building Security In Maturity Model (BSIMM) - acts as the measuring stick to determine your security posture
+- Software Security Touchpoints
 
 # Resources:
 
 - https://danaepp.com/the-api-hackers-guide-to-payload-injection-with-postman
+- https://owasp.org/API-Security/editions/2023/en/0x11-t10/
