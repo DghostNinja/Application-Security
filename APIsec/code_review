@@ -1,0 +1,20 @@
+[+] SQL injection - parameterized variable or input to prevent users input from being interpreted as normal SQL code or statement. 
+
+[+] Path traversal - use <os.path.basename> functon  to stripe traversal sequences from the filename/path. 
+
+- Use <os.path.commonprefix> function to ensure the file is within the scoe of the current directory.
+
+[+] RCE - Regex check to check and accept valid hostname and ip addresses.
+
+- Implement <subprocess.checkoutput> function
+
+[+] XML/XXE - check the modules used (e.g lxml module, XML.etree.element)
+
+- Validate user supplied entities
+- Use secure XML parser
+- Set the value of resolve_entities to false
+- Use defusedxml.ElementTree library to successfully pass XML data
+
+ [+] XSS - Sanitize users  input 
+
+- Use the markupsafe library to escape characters
