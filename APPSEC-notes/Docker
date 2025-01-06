@@ -1,0 +1,29 @@
+# Docker
+
+[+] docker images
+
+- list docker images
+
+[+] docker rmi i <container name>
+
+- delete docker image
+
+[+] docker stop <container_id>
+
+- stop docker
+
+[+] docker rm <container_id>
+
+- delete docker container by id ps
+
+[+] docker rmi -f <container_id>
+
+- force remove image
+
+[+] docker exec -it alpine-ssh-test /bin/sh
+
+- enter alpine docker
+
+[+] ssh-keygen -f "/home/ipsalmy/.ssh/known_hosts" -R "[localhost]:2222"
+
+- reset ssh fingerprint
