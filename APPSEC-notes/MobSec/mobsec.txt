@@ -1,0 +1,104 @@
+# Mobile Notes
+
+# ADB
+
+[+] sudo apt install adb
+
+[Install adb]
+
+[+] adb devices
+
+[check connected andriod devices]
+
+[+] adb connect device-IP
+
+[connect a device to adb]
+
+[+] adb -s 127.0.0.1:6555 shell
+
+[use when you have more than 1 device connected]
+
+[+] adb shell
+
+[gain root access to device]
+
+[+] adb push /file_path /sdcard/
+
+- adb -s 127.0.0.1:6555 push "/home/ipsalmy/Downloads/app.apk" /sdcard/
+
+[push file to connected device]
+
+[+] adb shell ls /sdcard/
+
+[list file in device]
+
+[+] adb logcat
+
+[Check adb log]
+
+[+] adb install apk_name
+
+[Install apps over adb]
+
+[+] adb shell ps | grep frida
+
+[check running frida services]
+
+[+] adb shell pm list packages
+
+[check app package name]
+
+[+] frida-trace -U -f com.live.app -i '*Verify*'
+
+[check if your bypass is working]
+
+# Install Frida and all it's components
+
+```bash
+pipx install frida frida-tools objection
+```
+
+[+] frida -U -n com.package_name -l bypass_ssl.js
+
+- frida -U -f com.live.walletwise -l bypass_ssl.js
+
+[bypass ssl pinning]
+
+# Install Objection
+
+site: https://apktool.org/docs/install/
+
+- Download apktool stuff and the apktool jar
+- mv to /usr/local/bin and chmod the 2 files
+
+[+] install java 
+
+```bash
+sudo apt install openjdk-17-jdk -y
+```
+
+[+] Run objection
+
+```bash
+sudo apt install pipx -y
+pipx ensurepath
+pipx install objection
+```
+
+[+] objection patchapk -s "app.apk" -a arm64
+
+[remove SSL pinning without specified architecture]
+
+## USE CASE
+
+[+] adb -s 127.0.0.1:6555 shell getprop ro.product.cpu.abi
+
+[Check architecture type from adb]
+
+[+] objection patchapk -s "app.apk" -a x86
+
+[patch app to bypass SSL pinning based on x86 architecture] 
+
+# Root Genymotion Manually
+
+[+] G
