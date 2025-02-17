@@ -99,6 +99,32 @@ pipx install objection
 
 [patch app to bypass SSL pinning based on x86 architecture] 
 
-# Root Genymotion Manually
+# Hook frida script to app
 
-[+] G
+[+] Download frida-server-andriod-x86 from release page 
+
+- uncompress and adb push to /data/local/tmp on andriod
+- rename the file to frida-server and chmod the file in the adb shell
+- ./frida-server
+
+[+] get a bypass script for your app technology and hook to package name 
+
+```bash
+frida -U -f com.live.app -l bypass_ssl.js
+```
+
+[+] to troubleshoot if it works….
+
+```bash
+frida-trace -U -f com.live.app -i '*Verify*'
+```
+
+# Proxy Andriod through Burp & Install certificate
+
+[+] set burp ip address to your local host ip
+
+- copy and paste this in your wifi advanced option with the port number
+- visist burp on the emulator or download burp CA cert and adb push to your emulator’s /sdcards/
+- save burp cert in .crt or .cer and go to settings on the emulator
+- search for install certificate on the settings and install CA cert from file storage.
+- Good to GO!
