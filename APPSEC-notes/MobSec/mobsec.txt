@@ -52,6 +52,28 @@
 
 [check if your bypass is working]
 
+[+] adb shell settings get global http_proxy
+
+[check proxy settings]
+
+[+] adb shell iptables -t nat -L -n -v
+
+[check ip route]
+
+[+] sudo ufw enable
+
+- sudo ufw enable
+
+[enable/disable firewall]
+
+[+] java -jar burploader.jar
+
+[install burp pro]
+
+[+] https://medium.com/@KpCyberInfo/android-pentesting-advanced-root-detection-bypass-smali-code-tampering-895361f24508
+
+[Manipulate smali file to bypass root detection]
+
 # Install Frida and all it's components
 
 ```bash
@@ -119,6 +141,29 @@ frida -U -f com.live.app -l bypass_ssl.js
 frida-trace -U -f com.live.app -i '*Verify*'
 ```
 
+[+] frida -U -f com.live.walletwise -e "$(curl -s https://raw.githubusercontent.com/httptoolkit/frida-android-unpinning/main/frida-script.js)"
+
+# Install Burp Pro
+
+[+] get the pro file installed 
+
+- run <java -jar burploader.jar> and click on auto run or manual activation process once the burp license verification interface pops up
+- After installation and verification, add this script to <nano ~/.local/share/applications/burpsuite.desktop> so you can have burp as launcher
+
+```bash
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=BurpSuite Pro
+Comment=Start BurpSuite with BurpLoader without resetting the license
+Exec=sh -c "cd /home/ipsalmy/burpsuite_pro_v2024.5 && /usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar burploader.jar"
+Icon=//home/ipsalmy/Pictures/burp.png
+Terminal=false
+Categories=Development;Security;
+StartupWMClass=BurpSuite
+
+```
+
 # Proxy Andriod through Burp & Install certificate
 
 [+] set burp ip address to your local host ip
@@ -128,3 +173,52 @@ frida-trace -U -f com.live.app -i '*Verify*'
 - save burp cert in .crt or .cer and go to settings on the emulator
 - search for install certificate on the settings and install CA cert from file storage.
 - Good to GO!
+
+# Fix internet issue in emulator
+
+[+] In adb shell 
+
+- **Disable the Proxy**
+
+Run the following commands inside **ADB Shell** (`adb shell`):
+
+```bash
+settings put global http_proxy :0
+settings put global global_http_proxy_host ""
+settings put global global_http_proxy_port 0
+
+```
+
+- **Restart Network**
+
+After disabling the proxy, restart the network:
+
+```bash
+svc wifi disable
+svc wifi enable
+
+```
+
+# Script
+
+[+] adb remount OR su
+
+[+] adb push 9a5ba575.0 /system/etc/security/cacerts/
+
+[+] use ./mobileconfig.sh,  set_proxy.sh, ./adb_ssl.sh tool
+
+- ensure you set the ip on the set_proxy.sh and burp to your host ip (ip dispalyed on burp).
+- ensure “support invisible proxing” is enabled in burp request handling
+
+[+] flush iptables if host netwoek has internet issues
+
+```bash
+sudo iptables -F
+sudo iptables -t nat -F
+sudo iptables -X
+sudo reboot
+```
+
+# MobSF
+
+[+]
