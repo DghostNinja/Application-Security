@@ -1,8 +1,12 @@
+# APPSEC && APISEC
+
 - DAST - Dynamic Application Security Testing
-    - Involves after production testing which is mostly black box with tools like ZAP, acunetix, veracode and gitlab
+    - Involves after production testing which is mostly black box with tools like ZAP, accunetix, veracode and gitlab
 - SAST - Static Application Security Testing
-    - Involves code review before launch which is mostly white box with tools like veracode, fortify, Synk, Checkmarx
+    - Involves code review before launch which is mostly white box with tools like veracode, fortify, Synk, Checkmarx, Semgrep
 - CI/CD - Continuous Integration and continuous Delivery or Deployment
+- REST - Representational State Transfer
+- SOAP - Simple Object Access Protocol
 
 # Gitlab integration
 
@@ -11,6 +15,8 @@
 - API DAST analyzer - testing APIs
 
 ---
+
+# APISEC
 
 - Machine-readable documentation is designed to be processed by software for automating tasks like API integration and validation. It's written in structured formats like JSON or XML.
 
@@ -239,6 +245,10 @@ PUT /accountAuthorization: Bearer <token>
 
 # API PENETRATION TESTING
 
+[+] http://127.0.0.1:8000/vapi
+
+[start vapi]
+
 RECON:
 
 - PASSIVE RECON:
@@ -250,6 +260,24 @@ RECON:
 [+] intitle:json site:"website[.com](http://microsoft.com/)"
 
 [+] use github search
+
+[+] mitmproxy2swagger -i crapi.apisec.ai.har -o crapi.yml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -e -f har --examples
+
+- sudo mitmproxy2swagger -i flows -o spec.yml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -f flow --examples
+- run the above command one more time after removing the “ignore” from your desired api endpoints
+- import to swagger editor
+
+[create rogue API endpoint with dev tool OR mitmweb]
+
+---
+
+# TRICKS
+
+[+] mitmproxy2swagger -i crapi.apisec.ai.har -o crapi.yaml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -e -f har
+
+[create rogue API endpoint]
+
+---
 
 # Software lifecycle:{Application Security}
 
@@ -324,6 +352,12 @@ Brooke's Law : Adding human resources to a late software project will make it la
 - OWASP SSDLC - done by following Agile security approach where Sprints are dedicated to security. Involves the Software Assurance Maturity Model (SAMM)
     - Building Security In Maturity Model (BSIMM) - acts as the measuring stick to determine your security posture
 - Software Security Touchpoints
+
+# Tips
+
+[+] curl -s URL | grep -Po "(\/)((?:[a-zA-Z\-_\:\.0-9\{\}]+))(\/)*((?:[a-zA-Z\-_\:\.0-9\{\}]+))(\/)((?:[a-zA-Z\-_\/\:\.0-9\{\}]+))" | sort -u
+
+[ Get all API endpoint from ajax js] 
 
 # Resources:
 
