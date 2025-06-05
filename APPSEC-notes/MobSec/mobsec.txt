@@ -1,6 +1,10 @@
 # Mobile Notes
 
+Apps: Native, Hybrid & Cross platform 
+
 # ADB
+
+[+] [adb commands](https://medium.com/@anandrishav2228/adb-commands-for-android-pentester-3cfde8c39d8b)
 
 [+] sudo apt install adb
 
@@ -32,7 +36,7 @@
 
 [list file in device]
 
-[+] adb logcat
+[+] adb logcat | grep app.package.name
 
 [Check adb log]
 
@@ -66,6 +70,14 @@
 
 [enable/disable firewall]
 
+[+] adb forward tcp: IP tcp: IP 
+
+[Port-forward drozer agent]
+
+[+] drozer console connect
+
+[Connect drozer]
+
 [+] java -jar burploader.jar
 
 [install burp pro]
@@ -73,6 +85,10 @@
 [+] https://medium.com/@KpCyberInfo/android-pentesting-advanced-root-detection-bypass-smali-code-tampering-895361f24508
 
 [Manipulate smali file to bypass root detection]
+
+[+] [Fixing genymotion black screen and crash](https://medium.com/@kspicykunle/my-genymotion-emulator-fix-journey-63ab3b099a25) 
+
+[+] Xposed Framework is **a tool that allows users to modify the behavior of their Android devices without needing to reflash or modify the Android system's base APKs**.
 
 # Install Frida and all it's components
 
@@ -85,6 +101,8 @@ pipx install frida frida-tools objection
 - frida -U -f com.live.walletwise -l bypass_ssl.js
 
 [bypass ssl pinning]
+
+[+] 
 
 # Install Objection
 
@@ -109,7 +127,7 @@ pipx install objection
 
 [+] objection patchapk -s "app.apk" -a arm64
 
-[remove SSL pinning without specified architecture]
+[remove SSL pinning with specified architecture]
 
 ## USE CASE
 
@@ -121,13 +139,21 @@ pipx install objection
 
 [patch app to bypass SSL pinning based on x86 architecture] 
 
-# Hook frida script to app
+[+] objection -g com.example.first_flutter_project explore
+
+[+] 
+
+# Hook frida script to app with frida-server
 
 [+] Download frida-server-andriod-x86 from release page 
 
 - uncompress and adb push to /data/local/tmp on andriod
 - rename the file to frida-server and chmod the file in the adb shell
 - ./frida-server
+
+[+] frida-server -Uai
+
+[Get app name]
 
 [+] get a bypass script for your app technology and hook to package name 
 
@@ -141,14 +167,40 @@ frida -U -f com.live.app -l bypass_ssl.js
 frida-trace -U -f com.live.app -i '*Verify*'
 ```
 
-[+] frida -U -f com.live.walletwise -e "$(curl -s https://raw.githubusercontent.com/httptoolkit/frida-android-unpinning/main/frida-script.js)"
+[+] frida -U -f com.live.app -e "$(curl -s https://raw.githubusercontent.com/httptoolkit/frida-android-unpinning/main/frida-script.js)"
+
+[+] Use objection with Frida server running to bypass root detection
+
+- objection -g app.package.name explore
+- This command should restart the app with objection hooked with it. Then while objection is running enter…
+- android root disable
+
+[Fridahook](https://sensepost.com/blog/2025/intercepting-https-communication-in-flutter-going-full-hardcore-mode-with-frida/)
+
+[+] use my customized root bypass script 
+
+- frida -U -f com.example.first_flutter_project -l bypass-root-emulator.js
+
+[+] You can also use apk-mitm to unpack and remove security checks from app. No need for Frida server running 
+
+- Uninstall the original APK before you install the patched
+
+[+] Install and use apk-mitm (Ensure you have node and java installed)
+
+- npm install -g apk-mitm
+- apk-mitm app.name.apk
 
 # Install Burp Pro
+
+[+] Optional
+
+- sudo update-alternatives --config java
 
 [+] get the pro file installed 
 
 - run <java -jar burploader.jar> and click on auto run or manual activation process once the burp license verification interface pops up
 - After installation and verification, add this script to <nano ~/.local/share/applications/burpsuite.desktop> so you can have burp as launcher
+- Ensure you download an image icon for the burp (Icon part)
 
 ```bash
 [Desktop Entry]
@@ -157,12 +209,16 @@ Type=Application
 Name=BurpSuite Pro
 Comment=Start BurpSuite with BurpLoader without resetting the license
 Exec=sh -c "cd /home/ipsalmy/burpsuite_pro_v2024.5 && /usr/lib/jvm/java-21-openjdk-amd64/bin/java -jar burploader.jar"
-Icon=//home/ipsalmy/Pictures/burp.png
+Icon=/home/ipsalmy/Pictures/burp.png
 Terminal=false
 Categories=Development;Security;
 StartupWMClass=BurpSuite
 
 ```
+
+[+] chmod the file <chmod +x ~/.local/share/applications/burpsuite.desktop>
+
+[+] Copy to desktop <cp ~/.local/share/applications/burpsuite.desktop ~/Desktop/>
 
 # Proxy Andriod through Burp & Install certificate
 
@@ -199,18 +255,21 @@ svc wifi enable
 
 ```
 
-# Script
-
 [+] adb remount OR su
+
+# Script
 
 [+] adb push 9a5ba575.0 /system/etc/security/cacerts/
 
 [+] use ./mobileconfig.sh,  set_proxy.sh, ./adb_ssl.sh tool
 
-- ensure you set the ip on the set_proxy.sh and burp to your host ip (ip dispalyed on burp).
-- ensure “support invisible proxing” is enabled in burp request handling
+- check the set_proxy.sh ip address and make sure it correlates with that of burp
+- ensure “support invisible proxying” is enabled in burp request handling
+- confirm if andriod requests are proxying into burp. Unset once confirmed
+- set the same ip for the mob_config.sh and set up andriod certification by running the ./mob_config.sh script.
+- now run ./adb.sh script and you should have ssl pinning bypassed and requests proxying through burp.
 
-[+] flush iptables if host netwoek has internet issues
+[+] flush iptables if host network has internet issues
 
 ```bash
 sudo iptables -F
@@ -219,6 +278,193 @@ sudo iptables -X
 sudo reboot
 ```
 
+# Fixing JDK 21 issue with burp-pro
+
+[+] download the java 21
+
+```bash
+https://download.java.net/java/GA/jdk21/fd2272bbf8e04c3dbaee13770090416c/35/GPL/openjdk-21_linux-x64_bin.tar.gz
+```
+
+[+] **1. Extract OpenJDK 21**
+
+Run the following command to extract the archive:
+
+```bash
+tar -xvzf openjdk-21_linux-x64_bin.tar.gz
+
+```
+
+After extracting, check the extracted folder name by running:
+
+```bash
+ls
+
+```
+
+It should display something like `jdk-21` or `jdk-21.0.2`.
+
+---
+
+### **2. Move the Extracted Folder to `/opt`**
+
+Once you identify the correct extracted folder name (e.g., `jdk-21.0.2`), move it to `/opt`:
+
+```bash
+sudo mv jdk-21.0.2 /opt/openjdk-21
+
+```
+
+---
+
+### **3. Verify the Files Are in Place**
+
+Check if Java is inside `/opt/openjdk-21/bin/`:
+
+```bash
+ls -l /opt/openjdk-21/bin/java
+
+```
+
+If this returns a valid result, continue to the next step.
+
+---
+
+### **4. Add Java 21 to the Alternatives System**
+
+Register OpenJDK 21 in the alternatives system:
+
+```bash
+sudo update-alternatives --install /usr/bin/java java /opt/openjdk-21/bin/java 21
+
+```
+
+Then, select Java 21 as the default version:
+
+```bash
+sudo update-alternatives --config java
+
+```
+
+---
+
+### **5. Verify Java Version**
+
+Run the following command to confirm that Java 21 is now active:
+
+```bash
+java -version
+
+```
+
+---
+
+Now try running Burp Suite again. Let me know if you face any issues! 
+
+- Run
+
+```bash
+java -jar burploader.jar
+```
+
 # MobSF
 
-[+]
+[+] sudo docker pull opensecurity/mobile-security-framework-mobsf:latest
+
+[+] docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest
+
+# JADX
+
+[+] git clone jadx
+
+[+] `./gradlew dist`
+
+[+] java -jar jadx-gui/build/libs/jadx-gui-*.jar
+
+[run Jadx gui]
+
+# Analysis
+
+[+] check resources on Jadx or MobSF for Android manifest and check for 
+
+- Backup if it's set to TRUE
+- Permissions
+- Exported
+
+[+] check strings.xml and “.com” for API keys 
+
+[+] Search for “secret key, awskey, password, https://(api-data), javascriptenabled, vendor” in the magic search of jadx
+
+[+] CD into the apps data storage and check for sensitive info in the “shared_pref/”
+
+[+] Logcat to check the ongoing process for sensitive information logging by the app.
+
+# Android OWASP TOP 10
+
+# Improper Platform usage
+
+- Check for improper permission request
+- Improper or inadequate use of fingerprint auth
+- Breach in security consent contract
+- Insecure logging and backup
+- Check vendor for harcoded key
+
+# Insecure Data Storage
+
+- Check if username and password are stored in shared_pref or any other sensitive part
+- Check database dir and check files with sqlitedb browser
+    - adb pull /data/data/database_dir
+
+# Insecure Communication
+
+Transmitting of sensitive data from interface to backend server with no encryption.
+
+- Interface communications over http
+- No encryption of user's data
+- Not verifying if it's a rooted device or not
+- No SSL pinning
+- Not verify CA certificate
+- Sharing of API key in transit
+- Check cache data storing sensitive info
+- If data can be manipulated in transit
+
+# Insecure Authentication
+
+- Executing backend API without proper access token
+- Storing password/login locally. Check shared_pref
+- No rate limit
+- 
+
+# Insufficient Cryptography
+
+- Weak encryption and decryption
+- Flawed encryption revealing sensitive info
+- 
+
+# Insecure Authorization
+
+- IDOR & BAC
+- Check for Activity files in jadx and search “check/chk” move to resources and check for “action”
+    - adb shell am start - n “the app package name/desired activity from logcat”
+    - Invoke with activity, action and parameter  [ adb shell am start - n “the app package name/desired activity from logcat” -a “copied action from jadx” --ez “copied parameter from jadx”
+
+# Poor Code Quality
+
+- Hardcoded secrets, Error logging revealing sensitive information without encapsulation, buffer overflow.
+- Use of bad code library and template/insecure boilerplate codes
+
+# Code Tampering
+
+- Changing the codebase of mobile apps to jailbreak them or tamper with specific features(modding)
+
+# Reverse Engineering
+
+- Digging into the binary string’s table of the mobile app and tampering with the source code
+- Performing cross-functional analysis
+
+# Extraneous Functionality
+
+- Enabling/disabling unintended functionality by testers or devs
+- Forgot to remove details, codes, features, configurations and logs used during testing, in production
+- Forgot to disable debug and backup
+-
