@@ -1,0 +1,114 @@
+```mermaid
+flowchart LR
+
+%% Colors 
+linkStyle default stroke:white, stroke-width:2px
+classDef blue fill:blue,stroke:#000,stroke-width:2px,color:#fff
+classDef orange fill:#fc822b,stroke:#000,stroke-width:2px,color:#fff
+classDef red fill:red,stroke:#000,stroke-width:2px,color:#fff
+classDef green fill:green,stroke:#000,stroke-width:2px,color:#fff
+classDef man fill:magenta,stroke:#000,stroke-width:2px,color:#fff
+
+%% just running a test
+%% link 0
+  G[(Goals)]:::blue <==> T(Target):::blue 
+  
+  %% Routine
+  %% Link 1,2,3
+  T --o D(Deadline):::orange
+  D ---x |Is|M([Met]):::green
+  D --- |is|U([Unmet]):::red ---> |push|Dn{4days}:::man
+  
+  %% Task
+  %% Link 4,5,6,7
+  T --o Tn(Aim):::orange
+  Tn --x |Is| IC([Incomplete]):::red
+  Tn --- C([Complete]):::green
+  C --> |Needs Review| R[[Review]]
+  
+  %%Run review %%
+  %% Link 8
+  R -.-> |create new|G
+  
+  %% Link colors
+  linkStyle 0 stroke:blue
+  linkStyle 1,5 stroke:orange
+  linkStyle 2,7 stroke:green
+  linkStyle 3,6 stroke:red
+  linkStyle 4 stroke:magenta
+  
+  
+  %% Clickable links
+  click T "https://www.notion.so/Target-1c49a3ec4ecf80f8af1ec837a254c901?pvs=4"
+  click G "https://www.notion.so/Goals-1c49a3ec4ecf80559ba1d1da476265ee?pvs=4"
+  click Tn "https://www.notion.so/1c49a3ec4ecf8042a4c4e823b4118510?v=1c49a3ec4ecf807bb4ca000cb5635446&pvs=4"
+
+```
+
+- Headers : flowchart/graph — to specific which kind diagram you want.
+    - TD, TB, BT, LR, RL - Direction of chart
+- Connectors :
+    - —> one-way link
+    - —  plain connector
+    - <—> 2 way link
+- %% - to comment
+- () - to define a variable name
+- | | - to comment
+- & - to branch
+- Shape:
+    - [ ] - add outside bracket change to cylinder shape by nexting
+    - [ ] put this inside a bracket to get a PILL shape
+    - [ [ ] ] Double parenthesis for rectangle
+    - <==> Make a connector line bold
+    - --o stoppage
+    - --x error handling
+    - -.-> make dotted lines
+    - {} - change shape to a diamond
+- classDef <class_name> fill - define a class/add color
+    - stroke - to add outline
+    - stroke-width — stroke depth
+    - color - for text color
+    - :::<class_name> - to call class name
+    
+    Ensure there's no space while adding attributes to the defined class
+    
+    - linkStyle default - change all link color (aside dotted links). You can add color to individual link by (linkStyle <no.> stroke:<Color>)
+    - stroke
+    - stroke-width
+- click <variable> “<link>” - to create clickable link
+
+[Goals](https://www.notion.so/Goals-1c49a3ec4ecf80559ba1d1da476265ee?pvs=21)
+
+[Target](https://www.notion.so/Target-1c49a3ec4ecf80f8af1ec837a254c901?pvs=21)
+
+```mermaid
+flowchart TD
+    Vulnera["Vulnera DAST Scanner"]:::main
+    Vulnera -->|"triggers"| CI["CI/CD Pipeline (GitHub Actions)"]:::ci
+    CI -->|"builds"| DC["Docker Container"]:::docker
+    DC -->|"supports"| ME["Manual Execution (CLI)"]:::manual
+    ME -->|"invokes"| SC["Scanner Core (scan.py)"]:::core
+    TI["Targets Input (CLI/targets.txt)"]:::input
+    DEPS["Deps (requirements.txt)"]:::deps
+    TI -->|"provides targets"| SC
+    DEPS -->|"supplies dependencies"| SC
+    SC -->|"runs scan with"| WS["Wapiti Scanner (External)"]:::external
+    SC -->|"reports via"| TR["Telegram Reporting (Telegram API)"]:::external
+
+    click CI "https://github.com/dghostninja/vulnera/blob/main/.github/workflows/main.yml"
+    click DC "https://github.com/dghostninja/vulnera/tree/main/Dockerfile"
+    click SC "https://github.com/dghostninja/vulnera/blob/main/scan.py"
+    click TI "https://github.com/dghostninja/vulnera/blob/main/targets.txt"
+    click DEPS "https://github.com/dghostninja/vulnera/blob/main/requirements.txt"
+    click WS "https://github.com/dghostninja/vulnera/blob/main/scan.py"
+    click TR "https://github.com/dghostninja/vulnera/blob/main/scan.py"
+
+    classDef main fill:#ADD8E6,stroke:#000,stroke-width:2px;
+    classDef ci fill:#C1E1C1,stroke:#000,stroke-width:2px;
+    classDef docker fill:#FFDAB9,stroke:#000,stroke-width:2px;
+    classDef manual fill:#FFFFCC,stroke:#000,stroke-width:2px;
+    classDef core fill:#D3D3D3,stroke:#000,stroke-width:2px;
+    classDef input fill:#FFB6C1,stroke:#000,stroke-width:2px;
+    classDef deps fill:#FFB6C1,stroke:#000,stroke-width:2px;
+    classDef external fill:#E0E0E0,stroke:#000,stroke-width:2px;
+```
