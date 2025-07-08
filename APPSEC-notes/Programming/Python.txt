@@ -1,6 +1,9 @@
 # Create a Venv environment
 
 - python3 -m venv myvenv(or any name)
+- source myvenv/bin/activate
+- deactivate
+
 
 # Lessons
 
