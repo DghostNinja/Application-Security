@@ -1,4 +1,4 @@
-# Docker
+#CMD
 
 [+] docker images
 
@@ -27,3 +27,99 @@
 [+] ssh-keygen -f "/home/ipsalmy/.ssh/known_hosts" -R "[localhost]:2222"
 
 - reset ssh fingerprint
+
+[+] docker init
+
+[Automatically generate docker file for a program]
+
+[+] docker scout cves docker-image-name:tag-given
+
+[Scan for vulnerability in container]
+
+# Docker
+
+Docker is an open-source platform that automates the deployment of applications inside lightweight, portable containers. A container is a standardized unit that packages an application’s code, dependencies, libraries, and configuration files together. Unlike traditional virtual machines (VMs), which require a full operating system for each instance, Docker containers share the host operating system’s kernel, making them faster, more lightweight, and resource-efficient.
+
+Example: running a flask app
+
+```docker
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install the required dependencies (assuming you have a requirements.txt file)
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose port 5000 (default port for Flask)
+EXPOSE 5000
+
+# Set the environment variable to tell Flask it's running in a production environment
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+
+# Run the Flask application
+CMD ["flask", "run"]
+```
+
+1.  Base Image: Use a Python-based image (python:3.8-slim). The official Python images are more suited for Python applications.
+2. COPY Command: You want to copy the entire current directory (COPY . /app).
+3. Install dependencies: Added RUN pip install -r requirements.txt to install dependencies, assuming you have a requirements.txt file for the Flask app.
+4. Expose Port 5000: Flask's default port is 5000, so it's more conventional to expose that port.
+5. CMD: The command is there to run Flask via flask run, which is more appropriate than directly calling [app.py](http://app.py/). The environment variables FLASK_APP and FLASK_RUN_HOST are set to ensure Flask runs correctly.
+
+```bash
+docker build -t flask-app .
+docker run -p 5000:5000 flask-app
+```
+
+- This will create a Docker image with the name flask-app and  run the container based on the flask-app image. Expose port 5000 from the container to port 5000 on your local machine (the default Flask port).
+- Your Flask app should now be accessible at [http://localhost:5000](http://localhost:5000/).
+- -t flask-app tags the image with the name flask-app.
+- . tells Docker to use the Dockerfile in the current directory.
+- - d runs the container in detached mode (in the background).
+- -p 3000:3000 maps port 3000 on your local machine to port 3000 in the container.
+
+```bash
+docker images
+```
+
+- To view docker image
+
+```bash
+docker ps
+```
+
+- Lists all running docker containers
+
+```bash
+docker logs <container-id>
+```
+
+View container logs
+
+```bash
+docker exec -it <container-id> /bin/bash
+```
+
+Access container shell
+
+Adapting for Other Applications or Websites
+
+The process is similar for other tech stacks:
+
+- Python (Flask/Django): Use FROM python:3.9, install dependencies with pip, and run your app.
+- PHP: Use FROM php:7.4-apache, copy your website files, and configure Apache.
+- Static Websites: Use FROM nginx and copy HTML/CSS files to /usr/share/nginx/html.
+
+Find base images on [Docker Hub](https://hub.docker.com/) and tweak the Dockerfile accordingly.
+
+For video [Guide](https://youtu.be/DQdB7wFEygo?si=Lif6Nz1BLoqbtsMy) 
+
+N.B: You can use docker scout to view detailed report and vulnerabilities in a docker container.
+
+- “docker init” can create the compose, ignore, Dockerfile and other things needed for your project.
