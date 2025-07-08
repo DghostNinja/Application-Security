@@ -1,0 +1,158 @@
+# Git
+
+- Git is a free open source version control system (save changes in programs)
+- Git is a tool that tracks your code changes over time
+- .MD - markdown
+
+[+] sudo apt install git -y
+
+[Install git]
+
+[+] git clone
+
+[Clone repo]
+
+[+] bundle install
+
+- bundle exec jekyll s
+
+[serve jekyll link locally]
+
+# Commiting locally
+
+[+] For new repo without cloning or SSH cloning
+
+- git remote add origin url_of_empty_gihub_repo
+- Set that with http containing GitHub PAT or SSH_URL
+
+[+] To use SSH URL to set remote repo in git
+
+- git remote set-url origin SSH_REPO_URL
+
+[+] git remote -v 
+
+[ Shows remote repo connected to a specific repo]
+
+[+] git init 
+
+- Do this in the folder you want to initialize
+
+[Initialize git folder]
+
+[+] git add file_name
+
+- <git add .> to track/add all files
+
+[Track your files and stage changes to a file in the working directory] 
+
+[+] git commit -m “message”
+
+[creates a permanent snapshot of your project's state locally]
+
+[+] git push -u origin master
+
+- git push -u origin main
+
+[ push repo or code to repo]
+
+# Commiting with git clone
+
+[+] git clone SSH_REPO_URL
+
+[ pull changes from repo]
+
+[+] git add file_name
+
+- <git add .> to track/add all files
+
+[Track your files and stage changes to a file in the working directory] 
+
+[+] git commit -m “message”
+
+[creates a permanent snapshot of your project's state locally]
+
+[+] git push -u origin master
+
+- git push -u origin main
+
+[ push repo or code to repo]
+
+[+] ssh-keygen
+
+- <cd ~/.ssh/> to check the ssh key id_rsa
+- <cat id_rsa.pub> check the public key. Copy and paste to GitHub SSH & GPG Keys
+
+[Create ssh key to GitHub]
+
+[+] git config —global [user.email](http://user.email) “github email”
+
+- git config —global [user.name](http://user.name) “GitHub name”
+
+[Configure GitHub on CLI]
+
+[+] git status 
+
+[Check git changes]
+
+# Branching
+
+- Branching allows pushing codes without affecting the root branch
+
+[+] git branch
+
+[Check what git branch you're working on]
+
+[+] git checkout -b new_branch_name 
+
+- The -b option is to create new branch.
+- Use <git checkout branch_name> to switch between branches
+
+[Used to switch/create branch]
+
+[+] git diff branch_name
+
+- <git diff> if you're already in desired branch
+
+[Check changes that have been made in branches/codes]
+
+[+] git push -u origin branch_name
+
+[Push to a specific branch]
+
+[+] You can merge the commits manually from GitHub or use CLI
+
+- git merge branch_name
+
+[Merging on CLI/GitHub]
+
+[+] git pull -u origin merged_root_branch_name
+
+- If you don't have upstream set, also make sure you're pulling locally on the branch you want the changes to appear, which is the root branch(main/master)
+- <git pull> if you have upstream set (-u origin branch_name)
+
+[ pull commit changes from GITHUB Repo]
+
+[+] git branch -d new_branch_name
+
+- Always use a new branch after merge
+
+[To delete branch]
+
+[+] git commit -am “message”
+
+- -a is to commit and add the file change or modified file only. The is m for your message/detail. This command only works for modified files not newly commits instead of using the “git add.”
+
+[Commit file change]
+
+[+] git reset file_name
+
+- <git reset HEAD> Reset just the last commit
+- <git reset HEAD~1> Reset 1 commit further the last commit
+- <git reset git_hash> to reset back to a specific commit using its log hash
+- <git reset —hard git_hash> to completely remove and reset commits and code changes
+
+[To unstage after local commit]
+
+[+] git log 
+
+[See the logs of all commits with their messages]
