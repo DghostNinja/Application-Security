@@ -12,6 +12,14 @@
 
 [Clone repo]
 
+[+] git fetch origin && git status
+
+[check if repo matches changes from remote to local]
+
+[+] git pull
+
+[pull all changes from remote repo and update local]
+
 [+] bundle install
 
 - bundle exec jekyll s
