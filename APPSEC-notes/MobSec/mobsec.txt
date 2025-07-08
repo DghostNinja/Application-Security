@@ -40,6 +40,10 @@ Apps: Native, Hybrid & Cross platform
 
 [Check adb log]
 
+[+] adb shell settings put system screen_off_timeout 2147483647
+
+[Set display time]
+
 [+] adb install apk_name
 
 [Install apps over adb]
@@ -51,6 +55,10 @@ Apps: Native, Hybrid & Cross platform
 [+] adb shell pm list packages
 
 [check app package name]
+
+[+] adb shell settings get global http_proxy
+
+[Check global proxy]
 
 [+] frida-trace -U -f com.live.app -i '*Verify*'
 
@@ -69,6 +77,10 @@ Apps: Native, Hybrid & Cross platform
 - sudo ufw enable
 
 [enable/disable firewall]
+
+[+] virsh domblklist <vm_name>
+
+[ find vm disk]
 
 [+] adb forward tcp: IP tcp: IP 
 
@@ -90,6 +102,20 @@ Apps: Native, Hybrid & Cross platform
 
 [+] Xposed Framework is **a tool that allows users to modify the behavior of their Android devices without needing to reflash or modify the Android system's base APKs**.
 
+[+] resize andriod emulator
+
+- adb shell wm size 1080x1920
+- adb shell wm density 480
+- adb shell wm size reset
+
+[+] frida-ps -Uai
+
+[Check running services on android]
+
+[+] adb shell ps -A | grep com.example.first_flutter_project
+
+[check specific package]
+
 # Install Frida and all it's components
 
 ```bash
@@ -103,6 +129,20 @@ pipx install frida frida-tools objection
 [bypass ssl pinning]
 
 [+] 
+
+# ADB Connect on Android X86 - QEMU virt-manager config
+
+[+] alt f1 to enter QEMU tty interface [alt f7 to go back]
+
+[+] enter
+
+- setprop service.adb.tcp.port 5555
+- stop adbd
+- start adbd
+- netstat -an | grep 5555
+- ip a OR ifconfig
+- adb connect <ip>:5555 [on main host]
+- netstat -an | grep 5555 [check on the andriod to see ESTABLISHED connection]
 
 # Install Objection
 
@@ -180,6 +220,7 @@ frida-trace -U -f com.live.app -i '*Verify*'
 [+] use my customized root bypass script 
 
 - frida -U -f com.example.first_flutter_project -l bypass-root-emulator.js
+- frida -U -f com.example.first_flutter_project -l bypass-root-emulator.js -p <id-tag>
 
 [+] You can also use apk-mitm to unpack and remove security checks from app. No need for Frida server running 
 
@@ -466,5 +507,62 @@ Transmitting of sensitive data from interface to backend server with no encrypti
 
 - Enabling/disabling unintended functionality by testers or devs
 - Forgot to remove details, codes, features, configurations and logs used during testing, in production
-- Forgot to disable debug and backup
--
+- Forgot to disable debug and backu
+- 
+
+# Exploits - Checklist
+
+#Exploiting Android Exported Activities 
+
+[+] Check if an export is set to true
+
+- adb shell am start com.package/.intent
+- 
+
+#Exploiting Android Exploit Services
+
+[+] Start the test app, check for services in the android manifest 
+
+- adb shell am help | grep service
+- adb shell start service com.package/.service-name
+
+#Exploiting android broadcast receiver
+
+[+] Check the android manifest for exported=”true” and check for activities. Ensure the exported class is exporting something important like “receiver”
+
+- adb shell am broadcast
+- adb shell start com.package/.activity-name
+- If that works ….. do < adb shell am broadcast -a com.package/.activity-name >
+
+[+] Trick user into visiting attacker’s url if the website uses a web view in the activity. 
+
+- adb shell am broadcast -a com.package/.activity-name --es <web_url_param> “https://google.com”
+- Users should be redirected to Google
+
+#Exploiting Android Deep Link
+
+[+] Search Android manifest for “scheme:” or use 
+
+- adb shell dumpsys package com.package.name
+- Check the scheme or schemas
+
+[+] Search for the web parameter and the parameter query
+
+- adb shell am start -W “[schema]://[host]/[path]?[queryparm]=[value]”
+- This can be good for XSS and other vulnerabilities
+
+#Exploiting Android Data Storage 
+
+[+] Check for stored passwords, maybe in plain texts or hashes.
+
+- ls  -ltr
+
+[+] Cat shared preferences “.XML”
+
+[+] Install sqlitedb browser on terminal, adb pull and view database
+
+#Exploiting Android SQL injection 
+
+[+] Search for “content providers” in as android manifest 
+
+[+] Check how the SQL parameters are handled
