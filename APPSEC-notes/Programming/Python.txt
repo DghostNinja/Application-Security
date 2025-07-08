@@ -1,0 +1,209 @@
+# Create a Venv environment
+
+- python3 -m venv myvenv(or any name)
+
+# Lessons
+
+- List
+    - .extend(another_list)
+    - .insert(index, "var")
+    - .append
+    - .copy
+    - .remove
+    - .sort
+    - .clear
+    - .index - #inprint
+    - .pop
+    - .court - #inprint
+    - .reverse
+- Tuples
+    - unchangeable and created using ( )
+- Functions
+    - return - breaks out of function/ passes assignment operator
+    - result - assign function/command expected output
+    - If statement :
+        - or - add another value to check a condition
+        - and - conditions have to be true or be in synch
+    - else - other condition/otherwise
+    - elif:
+        - and not - if both are not then preform so so ....
+        - and
+
+---
+
+# Ryan:
+
+Print statement to first line and next line
+
+```python
+print ("Hello \nhello world ")
+```
+
+Store strings in a variable 
+
+```python
+
+name = "Mark"
+print(name)
+
+```
+
+Collect input then use f to format strings -
+
+**Here's what the `f` does:**
+
+- **Expression Evaluation:**
+    
+    It signals to Python that the string contains expressions enclosed in curly braces `{}`.
+    
+
+```python
+name = input ("What is your name?" + " ")
+print (f"Hello! {name}")
+```
+
+Basic Array/List
+
+```python
+name = "Jake"
+print (name[0])
+```
+
+Lesson 2:
+
+You can make a variable into an integer by adding the int.
+
+Same for float
+
+```python
+print (78 + int("34"))
+```
+
+More example
+
+```python
+num1 = "12345"
+num2 = "67898"
+num3 = "87654"
+print (int(num1 [1]) + int(num3[1]))
+```
+
+Boolean
+
+N.B : trick to Boolean is knowing after “if” comes “elif” then an “else” to end it.
+
+```python
+A = int (input ("What is your Age? "))
+if A <=5: 
+   print ("You're a Kid")
+elif A <=15:  
+   print ("You're a big kid")
+else:   
+   print ("You're Old!")
+```
+
+More example 
+
+```python
+Temp = int (input("What's your Envirnoment Temperature in Celsius? "))
+
+if Temp <=28:    print ("You need boots")elif Temp <=38:  
+  print ("You need a coat")
+elif Temp <=78:  
+  print ("You need a Jacket")
+else:  
+  print ("It's nice outside")
+```
+
+Nexted If statements 
+
+```python
+Temp = int (input("What's your Envirnoment Temperature in Celsius? "))
+if Temp <=28:  
+  print ("You need boots")
+  #here is the nexted if statement
+    if <=35:
+      print ("You need boots and gloves")
+elif Temp <=38:  
+  print ("You need a coat")
+elif Temp <=78:  
+  print ("You need a Jacket")
+else:  
+  print ("It's nice outside")
+```
+
+Lesson 3:
+
+For Loop…e.g
+
+**"i"** is commonly used as a variable name, especially as an iterator in loops or as an index in lists
+
+```python
+dataset = ("This is a Storage")
+for i in dataset:  
+  print (i)
+```
+
+List 
+
+```python
+dataset = ["item1", "item2", "item3"]
+for i in dataset:  
+  print (i)
+```
+
+While Loop
+
+```python
+var_a = True
+i = 0
+while var_a:  
+  var_b = input ("Continue running program y or n ")  
+  i =+1   
+  print(i)  
+  if var_b == "n":   
+     var_a = False    
+     print ("Stopping programe\n")
+```
+
+Lesson 4:
+
+Functions 
+
+N.B: trick to function is writing the “def” and the “call function” first
+
+```python
+def my_function():  
+    print ("Tesing simple function usage")    
+       
+my_function()
+```
+
+More examples:
+
+```python
+def my_function(b):  
+    var_a = int(b) + 5 
+    print(var_a)   
+    
+my_function(input("Enter a number "))
+```
+
+```python
+def name_collector(a):  
+    var_a = a + "AMUEL" 
+    print(var_a)  
+    
+name_collector(input("Input the first letter of your name "))
+```
+
+Recon tool 
+
+```python
+import os
+def nmap(ip):  
+    os.system = (f"nmap -sC -sV {ip} -v")   
+    os.system = (f"dirb {ip}")    
+    
+nmap(input("What ip do you want to scan? "))
+```
