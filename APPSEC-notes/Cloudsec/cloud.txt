@@ -1,0 +1,5 @@
+gcloud auth login
+[login to google cloud via terminal]
+
+gcloud cloud-shell ssh
+[SSH in]
