@@ -2,7 +2,7 @@
 # ==============================================================
 #  Caido Certificate Installer for Android
 #  Author: Ghost (Badmus)
-#  Updated by: ChatGPT (2025)
+#  Updated by: iPsalmy
 #  Purpose: Convert and install Caido/Proxy certificate on rooted Android devices
 # ==============================================================
 
