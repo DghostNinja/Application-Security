@@ -6,6 +6,24 @@ Apps: Native, Hybrid & Cross platform
 
 [+] [adb commands](https://medium.com/@anandrishav2228/adb-commands-for-android-pentester-3cfde8c39d8b)
 
+[[+] Setting up android environments for bug bounty](https://www.yeswehack.com/learn-bug-bounty/android-lab-mobile-hacking-tools?utm_source=x&utm_medium=social&utm_campaign=android-lab-mobile) 
+
+[+] [Online AES decryption](https://www.javainuse.com/aesgenerator) 
+
+[+] [Android checklist](https://blog.oversecured.com/Android-security-checklist-webview/) 
+
+[+] [OWASP MOBILE](https://mas.owasp.org/MASTG/tools/android/MASTG-TOOL-0023/)
+
+[+] [Android SAST Courses](https://app.hextree.io/map/android/first-android-app/detail)
+
+[+] [iOS jailbreaking](https://ios.cfw.guide/) 
+
+[+] [Set Frida on iOS](https://medium.com/@zahidaz/manually-installing-and-configuring-frida-on-jailbroken-ios-devices-a-step-by-step-guide-e9e2673fdfc9) 
+
+[+] [SMS verification](https://www.smspool.net/) 
+
+[+] ANDRIOD 
+
 [+] sudo apt install adb
 
 [Install adb]
@@ -72,6 +90,10 @@ Apps: Native, Hybrid & Cross platform
 
 [check ip route]
 
+[+] strings app.apk | grep -i "http”
+
+[extract urls]
+
 [+] sudo ufw enable
 
 - sudo ufw enable
@@ -115,6 +137,37 @@ Apps: Native, Hybrid & Cross platform
 [+] adb shell ps -A | grep com.example.first_flutter_project
 
 [check specific package]
+
+[+] adb shell pm path com.mobilehackinglab.iotconnect
+
+[check path to an app]
+
+[+] adb pull <remote-path> <local-filename>
+
+- adb pull /data/app/~~UYJ9591SkNUfZJdeiShh4w==/com.mobilehackinglab.iotconnect-EtiXHrYkv8o0M5O4U4fFOQ==/base.apk ./iotconnect.apk
+
+[pull the app]
+
+[+] android:debuggable="true" — This is critical. It means the app can be debugged on a production device — potentially allowing an attacker to attach a debugger and inspect or tamper with app behavior. 
+
+- android:allowBackup="true" — Enables app data to be backed up and restored, which can expose sensitive information during backup operations.
+- android:usesCleartextTraffic="true" — Indicates that the app allows unencrypted HTTP traffic, opening the door to man-in-the-middle (MiTM) attacks. It should not be set to false.
+- android:requestLegacyExternalStorage="true" — Suggests the app may still be using the older, less secure storage model — allowing broader access to external storage.
+- android:extractNativeLibs="false" — Native libraries won't be extracted during install. While not directly a risk, it's good to be aware of in native code analysis.
+
+[common thing to check for]
+
+[+] SAI - Split Application Installer for bundle app
+
+[+] adb shell "su -c 'pkill frida-server'"
+[kill frida-server]
+
+[+]  adb shell "su -c /data/local/tmp/frida-server &"
+[start frida-server as root]
+
+[+]  ps -A | grep frida
+
+[check running frida-server]
 
 # Install Frida and all it's components
 
@@ -231,6 +284,16 @@ frida-trace -U -f com.live.app -i '*Verify*'
 - npm install -g apk-mitm
 - apk-mitm app.name.apk
 
+### frida-trace
+
+[+] frida-trace -U -f com.mobilehackinglab.challenge
+
+- 
+
+[trace app logs]
+
+[+] 
+
 # Install Burp Pro
 
 [+] Optional
@@ -297,6 +360,30 @@ svc wifi enable
 ```
 
 [+] adb remount OR su
+
+### ADB PULL APKS
+
+[+] adb shell pm list packages
+[+] adb shell pm path com.android.chrome
+[+] adb pull <app_path>
+
+- adb pull /data/app/com.android.chrome-abc123/base.apk
+
+[+] if app has multiple parts, pull all and install with…..
+
+- adb install-multiple base.apk split_config.arm64_v8a.apk split_config.en.apk
+
+### ADB CONNECT OVER VM
+
+[+]  Run this as admin in cmd/powershell
+
+- ipconfig to grab wireless network(HOST) ip
+- taskkill /f /t /im adb.exe
+- adb -a nodaemon server
+
+[+] Head over to the virtual machine and 
+
+- adb -H <IP> -P 5037 shell
 
 # Script
 
@@ -464,10 +551,10 @@ Transmitting of sensitive data from interface to backend server with no encrypti
 - No encryption of user's data
 - Not verifying if it's a rooted device or not
 - No SSL pinning
-- Not verify CA certificate
 - Sharing of API key in transit
 - Check cache data storing sensitive info
 - If data can be manipulated in transit
+- Not verify CA certificate
 
 # Insecure Authentication
 
@@ -507,7 +594,7 @@ Transmitting of sensitive data from interface to backend server with no encrypti
 
 - Enabling/disabling unintended functionality by testers or devs
 - Forgot to remove details, codes, features, configurations and logs used during testing, in production
-- Forgot to disable debug and backu
+- Forgot to disable debug and backup
 - 
 
 # Exploits - Checklist
@@ -530,14 +617,30 @@ Transmitting of sensitive data from interface to backend server with no encrypti
 
 [+] Check the android manifest for exported=”true” and check for activities. Ensure the exported class is exporting something important like “receiver”
 
-- adb shell am broadcast
-- adb shell start com.package/.activity-name
+- adb shell am broadcast -a <action>
+- adb shell am start com.package/.activity-name
 - If that works ….. do < adb shell am broadcast -a com.package/.activity-name >
+
+[+] Bruteforce PIN
+
+```bash
+for p in 0000 1111 1234 4321 9999; do
+  adb shell am broadcast -a MASTER_ON --es pin "$p" \
+    -n com.mobilehackinglab.iotconnect/.MasterReceiver
+done
+
+```
+
+[+] adb shell am broadcast -a <action> -ei key <pin>
+
+[pass a key/pin]
 
 [+] Trick user into visiting attacker’s url if the website uses a web view in the activity. 
 
 - adb shell am broadcast -a com.package/.activity-name --es <web_url_param> “https://google.com”
 - Users should be redirected to Google
+
+[+] 
 
 #Exploiting Android Deep Link
 
@@ -565,4 +668,9 @@ Transmitting of sensitive data from interface to backend server with no encrypti
 
 [+] Search for “content providers” in as android manifest 
 
-[+] Check how the SQL parameters are handled
+[+] Check how the SQL parameters are handled 
+
+## Tricks
+
+- [Android permissions](https://developer.android.com/reference/android/Manifest.permission)
+- Check strings.xml
