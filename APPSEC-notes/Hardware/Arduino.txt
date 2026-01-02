@@ -1,6 +1,8 @@
-- [ ]  [Simulate ardunio environment](https://simulator86.com/)
-- [ ]  [Hardware hacking](https://book.hacktricks.wiki/en/todo/hardware-hacking/index.html)
-- [ ]  [Ardunio core for IDE](https://github.com/arduino/ArduinoCore-avr?utm_source=chatgpt.com)
+[+] [Simulate ardunio environment](https://simulator86.com/) 
+
+[+] [Hardware hacking](https://book.hacktricks.wiki/en/todo/hardware-hacking/index.html) 
+
+[+] [Ardunio core for IDE](https://github.com/arduino/ArduinoCore-avr?utm_source=chatgpt.com)
 
 ### Ardunio interface
 
