@@ -1,0 +1,140 @@
+- [ ]  [Simulate ardunio environment](https://simulator86.com/)
+- [ ]  [Hardware hacking](https://book.hacktricks.wiki/en/todo/hardware-hacking/index.html)
+- [ ]  [Ardunio core for IDE](https://github.com/arduino/ArduinoCore-avr?utm_source=chatgpt.com)
+
+### Ardunio interface
+
+- Digital pins
+- Power pins
+- Analog pins
+- Bread board
+    - + is power suplly
+    - - is the ground (GND)
+- Resistor
+    - 4 bands : 1st, 2nd x 3rd = XOhms
+    - 5 bands: 1st, 2nd, 3rd x 4th = XOhms
+    
+    [You can use resistor color code [digikey](https://www.digikey.com/en/resources/conversion-calculators/conversion-calculator-resistor-color-code) web]
+    
+
+# Code Basics
+
+```cpp
+void setup() {
+  Serial.begin(9600);   // Start serial communication
+}
+
+void loop() {
+  Serial.println("Hello!");
+}
+```
+
+- Serial.begin(9600); starts serial communication at 9600 bps. The Arduino sends and receives 9600 bits every second
+- A baud rate is the speed of communication between the Arduino and another device (like your computer).
+- Common baud rates
+    - 9600 (most common)
+    - 19200
+    - 38400
+    - 57600
+    - 115200 (faster, often used)
+
+### Variables
+
+```cpp
+int a = 5;
+int b;
+
+void setup(){
+  a = 7 + 4;
+  // overwrite the previous integer a
+  b = a + 4;
+  Serial.begin(9600);
+  Serial.println(b);
+}
+
+void loop(){
+  
+}
+```
+
+### Constant Variables
+
+```cpp
+#define LED_PIN 12 
+// Constant - Unchanged throughout the program
+
+int a = 5;
+int b;
+
+void setup(){
+  a = 7 + 4;
+  b = a + 4;
+  Serial.begin(9600);
+  Serial.println(b);
+}
+
+void loop(){
+  
+}
+```
+
+### Data Type
+
+- double - for decimal
+- bool - true/false
+- string - store text
+- int - for integers. Takes value from - 32,768 to + 32,767 (causes over flow in case of big integer value)
+- long - takes over 2 billion integers (use it in case of big integer value)
+- 
+
+```cpp
+
+```
+
+## Blink LED and Write output
+
+```cpp
+const int ledPin = 13;
+
+void setup() {
+    pinMode(ledPin, OUTPUT);
+    Serial.begin(9600);
+}
+
+void loop() {
+    // Turn LED ON
+    digitalWrite(ledPin, HIGH);
+    Serial.println("LED is ON");
+    delay(2000);  // 2 seconds
+
+    // Turn LED OFF
+    digitalWrite(ledPin, LOW);
+    Serial.println("LED is OFF");
+    delay(1000);  // 1 second
+}
+```
+
+### Blink light with real circuit
+
+- Jumper wire from GND on Arduino to breadboard GND (-)
+- shorter leg of LED light to GND on bread board, then longer leg to any point on board
+- first leg of 220 ohms resistor to longer leg of LED, and second leg to any point
+- Second jumper wire from second leg of resistor to DIGITAL pin 12 on arduino
+
+```cpp
+
+void setup()
+{
+  pinMode(12, OUTPUT);
+}
+
+void loop()
+{
+  digitalWrite(12, HIGH);
+  delay(1000); // Wait for 1000 millisecond(s)
+  digitalWrite(12, LOW);
+  delay(1000); // Wait for 1000 millisecond(s)
+}
+```
+
+###
