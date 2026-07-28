@@ -209,6 +209,20 @@ config.keys = {
         action = wezterm.action.ActivateCopyMode,
     },
 
+    -- Rotate panes clockwise
+    {
+        key = "r",
+        mods = "CTRL|SHIFT",
+        action = wezterm.action.RotatePanes "Clockwise",
+    },
+
+    -- Move pane to new tab (standalone)
+    {
+        key = "d",
+        mods = "CTRL|SHIFT",
+        action = wezterm.action.PaneSelect { mode = "MoveToNewTab" },
+    },
+
 }
 
 
