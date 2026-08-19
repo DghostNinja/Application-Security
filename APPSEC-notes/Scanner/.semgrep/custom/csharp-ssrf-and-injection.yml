@@ -1,0 +1,83 @@
+rules:
+  - id: custom-csharp-ssrf
+    languages:
+      - csharp
+    severity: ERROR
+    message: >-
+      Request-controlled data flows into an outbound HTTP request URL.
+      An attacker can point the request at internal services (SSRF).
+      Validate the host against an allowlist and reject IP literals and
+      non-HTTPS schemes.
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromBody] $TYPE $REQ) { ... }
+          - pattern: $REQ.$PROP
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromQuery] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromRoute] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromForm] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - pattern: Request.Query[$KEY]
+      - pattern: Request.Form[$KEY]
+      - pattern: Request.Headers[$KEY]
+      - pattern: Request.RouteValues[$KEY]
+    pattern-sanitizers:
+      - pattern: Uri.TryCreate($X, ...)
+      - pattern: new Uri($X)
+      - pattern: $X.StartsWith("https://", ...)
+    pattern-sinks:
+      - pattern: $HTTP.GetAsync($URL)
+      - pattern: $HTTP.GetStringAsync($URL)
+      - pattern: $HTTP.PostAsync($URL, ...)
+      - pattern: $HTTP.SendAsync($REQUEST)
+      - pattern: $HTTP.Send($REQUEST)
+      - pattern: WebRequest.Create($URL)
+      - pattern: HttpClient().$ANY($URL)
+      - pattern: RestClient($URL)
+      - pattern: new Uri($BASE + $URL)
+
+  - id: custom-csharp-command-injection
+    languages:
+      - csharp
+    severity: ERROR
+    message: >-
+      Request-controlled data reaches a process execution call. Build the
+      argument list separately (never string-interpolate shell commands) and
+      validate inputs against a strict allowlist.
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromBody] $TYPE $REQ) { ... }
+          - pattern: $REQ.$PROP
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromQuery] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromRoute] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromForm] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - pattern: Request.Query[$KEY]
+      - pattern: Request.Form[$KEY]
+      - pattern: Request.Headers[$KEY]
+      - pattern: Request.RouteValues[$KEY]
+    pattern-sanitizers:
+      - pattern: Path.GetFileName($X)
+    pattern-sinks:
+      - pattern: Process.Start($ARG, ...)
+      - pattern: new Process().StartInfo.Arguments = $ARG
+      - pattern: Process.Start($EXE, $ARGS)

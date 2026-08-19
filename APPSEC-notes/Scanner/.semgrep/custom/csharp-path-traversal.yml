@@ -1,0 +1,130 @@
+rules:
+  - id: custom-csharp-path-traversal-write
+    languages:
+      - csharp
+    severity: ERROR
+    message: >-
+      Request-controlled data reaches a file write operation. Validate the
+      resolved path stays inside an intended directory (e.g. Path.GetFullPath
+      + StartsWith containment check) before writing.
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromBody] $TYPE $REQ) { ... }
+          - pattern: $REQ.$PROP
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromQuery] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromRoute] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromForm] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - pattern: Request.Query[$KEY]
+      - pattern: Request.Form[$KEY]
+      - pattern: Request.Headers[$KEY]
+      - pattern: Request.RouteValues[$KEY]
+    pattern-sanitizers:
+      - pattern: Path.GetFileName($X)
+      - pattern: $X.Split(Path.GetInvalidFileNameChars())
+      - pattern: Path.GetFullPath($X)
+      - pattern: $X.StartsWith($DIR, ...)
+    pattern-sinks:
+      - pattern: System.IO.File.WriteAllBytesAsync($PATH, $DATA)
+      - pattern: System.IO.File.WriteAllTextAsync($PATH, $DATA)
+      - pattern: System.IO.File.WriteAllText($PATH, $DATA)
+      - pattern: System.IO.File.AppendAllTextAsync($PATH, $DATA)
+      - pattern: System.IO.File.Create($PATH)
+      - pattern: System.IO.File.CreateAsync($PATH)
+      - pattern: System.IO.File.Copy($SRC, $PATH)
+      - pattern: System.IO.File.Move($SRC, $PATH)
+
+  - id: custom-csharp-path-traversal-read
+    languages:
+      - csharp
+    severity: ERROR
+    message: >-
+      Request-controlled data reaches a file read operation. Restrict the
+      path to an allowed directory (Path.GetFullPath + StartsWith check).
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromBody] $TYPE $REQ) { ... }
+          - pattern: $REQ.$PROP
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromQuery] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromRoute] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromForm] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - pattern: Request.Query[$KEY]
+      - pattern: Request.Form[$KEY]
+      - pattern: Request.Headers[$KEY]
+      - pattern: Request.RouteValues[$KEY]
+    pattern-sanitizers:
+      - pattern: Path.GetFileName($X)
+      - pattern: $X.Split(Path.GetInvalidFileNameChars())
+      - pattern: Path.GetFullPath($X)
+      - pattern: $X.StartsWith($DIR, ...)
+    pattern-sinks:
+      - pattern: System.IO.File.ReadAllBytesAsync($PATH)
+      - pattern: System.IO.File.ReadAllBytes($PATH)
+      - pattern: System.IO.File.ReadAllTextAsync($PATH)
+      - pattern: System.IO.File.ReadAllText($PATH)
+      - pattern: System.IO.File.OpenRead($PATH)
+      - pattern: System.IO.File.Open($PATH, ...)
+      - pattern: Directory.GetFiles($PATH, ...)
+      - pattern: Directory.GetDirectories($PATH, ...)
+      - pattern: Directory.Exists($PATH)
+      - pattern: Directory.Delete($PATH)
+
+  - id: custom-csharp-path-traversal-delete
+    languages:
+      - csharp
+    severity: ERROR
+    message: >-
+      Request-controlled data reaches a file delete operation. Restrict the
+      path to an allowed directory (Path.GetFullPath + StartsWith check).
+    mode: taint
+    pattern-sources:
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromBody] $TYPE $REQ) { ... }
+          - pattern: $REQ.$PROP
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromQuery] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromRoute] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - patterns:
+          - pattern-inside: |
+              public $RET $M([FromForm] $TYPE $REQ) { ... }
+          - pattern: $REQ
+      - pattern: Request.Query[$KEY]
+      - pattern: Request.Form[$KEY]
+      - pattern: Request.Headers[$KEY]
+      - pattern: Request.RouteValues[$KEY]
+    pattern-sanitizers:
+      - pattern: Path.GetFileName($X)
+      - pattern: $X.Split(Path.GetInvalidFileNameChars())
+      - pattern: Path.GetFullPath($X)
+      - pattern: $X.StartsWith($DIR, ...)
+    pattern-sinks:
+      - pattern: System.IO.File.Delete($PATH)
+      - pattern: File.Delete($PATH)
+      - pattern: FileInfo($PATH).Delete()
