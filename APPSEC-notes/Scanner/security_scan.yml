@@ -1,0 +1,1083 @@
+# ---------------------------------------------------------------------------
+# Security Scan (Semgrep + Gitleaks + Trivy) - NON-BLOCKING
+#
+# What it does:
+#   * Runs on every push to any branch, on every pull request, daily on a
+#     schedule (dependency CVEs are published after the last commit), and on
+#     manual dispatch.
+#   * Scans with five free, no-login tools:
+#       - Semgrep (OSS)  : cross-stack SAST (C#, Python, JS/TS, Java, Go,
+#                          Ruby, PHP + CI & Dockerfile rules), only
+#                          ERROR-severity (exploitable/high impact)
+#       - Gitleaks       : leaked secrets / hardcoded credentials
+#       - Trivy (binary) : dependency vulns + Dockerfile misconfig,
+#                          only HIGH/CRITICAL (source scan, auto-detects
+#                          ecosystem: NuGet, npm, pip, Maven, Go, etc.)
+#       - Trivy (image)  : container image scan (OS packages + runtime deps)
+#       - Checkov (OSS)  : IaC misconfigs - auto-detects framework
+#                          (Dockerfile, GitHub Actions, Terraform, K8s, ...),
+#                          only HIGH/CRITICAL
+#   * Portable template: every step auto-detects the tech stack (no hardcoded
+#     project paths or languages), so this file can be dropped into any
+#     repository. Steps that do not apply are skipped automatically.
+#   * Produces:
+#       - GitHub Code Scanning alerts (SARIF upload, best-effort; requires GHAS
+#         on private repos)
+#       - A combined markdown report + a modern HTML report (searchable,
+#         severity-filtered, with fix guidance) uploaded as an artifact
+#       - A concise summary comment on pull requests
+#       - A summary on the workflow run page (job summary)
+#       - GitHub Issues on the default branch: one issue per finding, labelled
+#         with severity, auto-closed when a finding is fixed, reopened if it
+#         regresses. Opening/closing issues notifies repo watchers.
+#   * NEVER fails the build and NEVER blocks merge or deployment. Every scan
+#     step is continue-on-error.
+#
+# False-positive tuning knobs:
+#   - Semgrep severity  : change `--severity error` to `error,warning` if you
+#                         want more coverage (more noise).
+#   - Trivy severity    : change `--severity HIGH,CRITICAL` to `MEDIUM,...`.
+#   - Trivy unfixed     : remove `--ignore-unfixed` to include CVEs with no fix
+#                         yet (noisier, but complete).
+#   - Add rules/ignore paths in .semgrepignore (repo root).
+# ---------------------------------------------------------------------------
+name: Security Scan (non-blocking)
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  actions: read
+  issues: write
+
+env:
+  GITLEAKS_VERSION: "8.30.1"
+  TRIVY_VERSION: "0.70.0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  security-scan:
+    name: Security scan (Semgrep / Gitleaks / Trivy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ------------------------------------------------------------------
+      # Semgrep (SAST) - free OSS, no login required
+      # ------------------------------------------------------------------
+      - name: Install Semgrep
+        continue-on-error: true
+        run: |
+          python -m pip install --quiet --upgrade semgrep
+          semgrep --version
+
+      - name: Semgrep scan (JSON report)
+        continue-on-error: true
+        run: |
+          semgrep scan \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/ci \
+            --config p/dockerfile \
+            --config p/csharp \
+            --config p/python \
+            --config p/javascript \
+            --config p/typescript \
+            --config p/java \
+            --config p/golang \
+            --config p/ruby \
+            --config p/php \
+            --severity ERROR \
+            --metrics off \
+            --disable-version-check \
+            --timeout 30 \
+            --max-memory 4096 \
+            --json \
+            --output semgrep.json \
+            .
+
+      # SARIF run only feeds GitHub Code Scanning (best-effort). Drop this step
+      # if Code Scanning is not available on this repo (private repo without
+      # Advanced Security) to save ~2-3 min per run.
+      - name: Semgrep scan (SARIF for Code Scanning)
+        continue-on-error: true
+        run: |
+          semgrep scan \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/ci \
+            --config p/dockerfile \
+            --config p/csharp \
+            --config p/python \
+            --config p/javascript \
+            --config p/typescript \
+            --config p/java \
+            --config p/golang \
+            --config p/ruby \
+            --config p/php \
+            --severity ERROR \
+            --metrics off \
+            --disable-version-check \
+            --timeout 30 \
+            --max-memory 4096 \
+            --sarif \
+            --output semgrep.sarif \
+            .
+
+      # ------------------------------------------------------------------
+      # Gitleaks (secrets) - pinned release, SHA256-verified binary
+      # ------------------------------------------------------------------
+      - name: Install Gitleaks
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          curl -fsSL -o gitleaks.tar.gz "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSL -o gitleaks-checksums.txt "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          EXPECTED=$(grep -F "gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" gitleaks-checksums.txt | awk '{print $1}')
+          echo "${EXPECTED}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz
+          ./gitleaks version
+
+      - name: Gitleaks scan (JSON report)
+        continue-on-error: true
+        run: |
+          ./gitleaks dir --config .gitleaks.toml --report-format json --report-path gitleaks.json --exit-code 0 --no-banner --log-level warn .
+
+      - name: Gitleaks scan (SARIF for Code Scanning)
+        continue-on-error: true
+        run: |
+          ./gitleaks dir --config .gitleaks.toml --report-format sarif --report-path gitleaks.sarif --exit-code 0 --no-banner --log-level warn .
+
+      # ------------------------------------------------------------------
+      # Checkov (IaC) - free OSS, no login. Scans Dockerfile + GitHub
+      # Actions configs for misconfigurations. Pinned via pip.
+      # ------------------------------------------------------------------
+      - name: Install Checkov
+        continue-on-error: true
+        run: |
+          python -m pip install --quiet --upgrade checkov
+          checkov --version
+
+      - name: Checkov scan (JSON report)
+        continue-on-error: true
+        run: |
+          checkov --directory . \
+            --download-external-modules false \
+            --quiet --compact \
+            --output json > checkov.json
+
+      - name: Checkov scan (SARIF for Code Scanning)
+        continue-on-error: true
+        run: |
+          checkov --directory . \
+            --download-external-modules false \
+            --quiet --compact \
+            --output sarif > checkov.sarif
+
+      # ------------------------------------------------------------------
+      # Trivy (deps + misconfig) - pinned release, SHA256-verified binary.
+      # NOTE: we deliberately do NOT use aquasecurity/trivy-action - it was
+      # compromised (CVE-2026-33634); the verified binary avoids that.
+      # ------------------------------------------------------------------
+      - name: Install Trivy
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          curl -fsSL -o trivy.tar.gz "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz"
+          curl -fsSL -o trivy-checksums.txt "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_checksums.txt"
+          EXPECTED=$(grep -F "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" trivy-checksums.txt | awk '{print $1}')
+          echo "${EXPECTED}  trivy.tar.gz" | sha256sum -c -
+          tar -xzf trivy.tar.gz
+          ./trivy --version
+
+            # Restore NuGet deps so Trivy can scan them. Trivy reads
+      # obj/project.assets.json (generated by restore) - it cannot resolve a
+      # plain .csproj on its own. Only runs when a .NET project is present;
+      # skipped automatically for other tech stacks.
+      - name: Restore NuGet packages (for Trivy)
+        if: hashFiles('**/*.sln', '**/*.csproj', '**/*.fsproj', '**/*.vbproj') != ''
+        continue-on-error: true
+        run: |
+          SLN=$(find . -maxdepth 3 -iname '*.sln' | head -n 1)
+          if [ -n "$SLN" ]; then
+            dotnet restore "$SLN" --nologo
+          else
+            PROJ=$(find . -maxdepth 3 \( -iname '*.csproj' -o -iname '*.fsproj' -o -iname '*.vbproj' \) | head -n 1)
+            dotnet restore "$PROJ" --nologo
+          fi
+
+      - name: Trivy scan dependencies & misconfig (JSON report)
+        continue-on-error: true
+        run: |
+          ./trivy fs \
+            --scanners vuln,misconfig \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --skip-dirs valuehrmapi/Logs \
+            --skip-dirs valuehrmapi/wwwroot/uploads \
+            --format json \
+            --output trivy.json \
+            .
+
+      - name: Trivy scan dependencies & misconfig (SARIF for Code Scanning)
+        continue-on-error: true
+        run: |
+          ./trivy fs \
+            --scanners vuln,misconfig \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --skip-dirs valuehrmapi/Logs \
+            --skip-dirs valuehrmapi/wwwroot/uploads \
+            --format sarif \
+            --output trivy.sarif \
+            .
+
+            # ------------------------------------------------------------------
+      # Trivy image - scans the built container image (OS packages + runtime
+      # deps), complementing the fs scan above (source deps). Generic: finds
+      # any Dockerfile in the repo, so it works for any stack that ships a
+      # container. Skipped entirely if no Dockerfile exists.
+      # ------------------------------------------------------------------
+      - name: Build container image (for Trivy image scan)
+        if: hashFiles('**/Dockerfile*') != ''
+        continue-on-error: true
+        run: |
+          DF=$(find . -maxdepth 3 -type f \( -iname 'Dockerfile' -o -iname 'Dockerfile.*' \) | head -n 1)
+          if [ -z "$DF" ]; then
+            echo "No Dockerfile found, skipping image build"
+            exit 0
+          fi
+          docker build -f "$DF" -t hrm-backend:scan "$(dirname "$DF")"
+
+      - name: Trivy image scan (JSON report)
+        if: hashFiles('**/Dockerfile*') != ''
+        continue-on-error: true
+        run: |
+          ./trivy image \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --format json \
+            --output trivy-image.json \
+            hrm-backend:scan
+
+      - name: Trivy image scan (SARIF for Code Scanning)
+        if: hashFiles('**/Dockerfile*') != ''
+        continue-on-error: true
+        run: |
+          ./trivy image \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --format sarif \
+            --output trivy-image.sarif \
+            hrm-backend:scan
+
+      # ------------------------------------------------------------------
+      # Upload results to GitHub Code Scanning (best-effort; requires GHAS /
+      # Code Security on private repos). Never blocks anything.
+      # ------------------------------------------------------------------
+      - name: Upload Semgrep SARIF
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+          category: security-scan-semgrep
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Gitleaks SARIF
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: gitleaks.sarif
+          category: security-scan-gitleaks
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy SARIF
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy.sarif
+          category: security-scan-trivy
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Checkov SARIF
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: checkov.sarif
+          category: security-scan-checkov
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Trivy image SARIF
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-image.sarif
+          category: security-scan-trivy-image
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ------------------------------------------------------------------
+      # Build the combined human-readable report + job summary
+      # ------------------------------------------------------------------
+      - name: Generate security report
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import html
+          from datetime import datetime, timezone
+
+          def load(path):
+              try:
+                  with open(path, encoding='utf-8') as f:
+                      return json.load(f)
+              except Exception:
+                  return None
+
+          def mask(secret):
+              if not secret:
+                  return ''
+              s = str(secret)
+              return s[:4] + '****' + s[-4:] if len(s) > 8 else '****'
+
+          def esc(v):
+              return str(v).replace('|', '\\|').replace('\n', ' ').replace('\r', ' ')
+
+          # ---- Collect findings from all five tools into a uniform model ----
+          # Fields: tool, severity, id, file, line, cwe, message, fix, link,
+          #         pkg, installed, secret
+
+          sem = load('semgrep.json')
+          gil = load('gitleaks.json')
+          tri = load('trivy.json')
+          tri_img = load('trivy-image.json')
+          ckv = load('checkov.json')
+
+          sem_findings = []
+          if sem:
+              for r in sem.get('results', []):
+                  extra = r.get('extra') or {}
+                  meta = extra.get('metadata') or {}
+                  sem_findings.append({
+                      'tool': 'Semgrep (SAST)',
+                      'severity': (extra.get('severity') or 'ERROR').upper(),
+                      'id': r.get('check_id', ''),
+                      'file': r.get('path', ''),
+                      'line': (r.get('start') or {}).get('line', ''),
+                      'cwe': ', '.join(meta.get('cwe') or []),
+                      'message': (extra.get('message') or '').strip().split('\n')[0][:240],
+                      'fix': '',
+                      'link': meta.get('shortlink') or meta.get('source') or '',
+                      'pkg': '',
+                      'installed': '',
+                      'secret': '',
+                  })
+
+          gil_findings = []
+          if isinstance(gil, list):
+              for r in gil:
+                  gil_findings.append({
+                      'tool': 'Gitleaks (secrets)',
+                      'severity': 'CRITICAL',
+                      'id': r.get('RuleID', ''),
+                      'file': r.get('File', ''),
+                      'line': r.get('StartLine', ''),
+                      'cwe': '',
+                      'message': (r.get('Description') or '')[:200],
+                      'fix': 'Rotate the leaked credential and remove it from the codebase and history.',
+                      'link': 'https://gitleaks.io/',
+                      'pkg': '',
+                      'installed': '',
+                      'secret': mask(r.get('Secret')),
+                  })
+
+          def parse_trivy(path, label):
+              out = []
+              data = load(path)
+              if not data:
+                  return out
+              for res in data.get('Results') or []:
+                  target = res.get('Target', '')
+                  for v in res.get('Vulnerabilities') or []:
+                      out.append({
+                          'tool': label,
+                          'severity': (v.get('Severity') or '').upper(),
+                          'id': v.get('VulnerabilityID', ''),
+                          'file': target,
+                          'line': '',
+                          'cwe': ', '.join(v.get('CweIDs') or []),
+                          'message': (v.get('Title') or '')[:220],
+                          'fix': 'Upgrade to %s' % (v.get('FixedVersion') or 'N/A (no fix published)'),
+                          'link': 'https://nvd.nist.gov/vuln/detail/%s' % (v.get('VulnerabilityID') or ''),
+                          'pkg': v.get('PkgName', ''),
+                          'installed': v.get('InstalledVersion', ''),
+                          'secret': '',
+                      })
+                  for m in res.get('Misconfigurations') or []:
+                      out.append({
+                          'tool': label,
+                          'severity': (m.get('Severity') or '').upper(),
+                          'id': m.get('ID', ''),
+                          'file': target,
+                          'line': '',
+                          'cwe': '',
+                          'message': (m.get('Title') or m.get('Description') or '')[:220],
+                          'fix': m.get('Resolution') or '',
+                          'link': 'https://avd.aquasec.com/misconfig/%s' % (m.get('ID') or ''),
+                          'pkg': '',
+                          'installed': '',
+                          'secret': '',
+                      })
+              return out
+
+          tri_findings = parse_trivy('trivy.json', 'Trivy (deps / misconfig)')
+          tri_img_findings = parse_trivy('trivy-image.json', 'Trivy (container image)')
+
+          ckv_findings = []
+          if isinstance(ckv, dict):
+              for check_type, section in ckv.items():
+                  if not isinstance(section, dict):
+                      continue
+                  for c in ((section.get('results') or {}).get('failed_checks') or []):
+                      if (c.get('check_result') or {}).get('result') != 'FAILED':
+                          continue
+                      sev = (c.get('severity') or 'MEDIUM').upper()
+                      if sev not in ('CRITICAL', 'HIGH'):
+                          continue
+                      line_range = c.get('file_line_range') or []
+                      ckv_findings.append({
+                          'tool': 'Checkov (IaC)',
+                          'severity': sev,
+                          'id': c.get('check_id', ''),
+                          'file': (c.get('file_path') or '').lstrip('/'),
+                          'line': line_range[0] if line_range else '',
+                          'cwe': '',
+                          'message': (c.get('check_name') or '')[:220],
+                          'fix': 'Fix per Checkov guideline',
+                          'link': c.get('guideline') or '',
+                          'pkg': '',
+                          'installed': '',
+                          'secret': '',
+                      })
+
+          sev_order = {'CRITICAL': 0, 'ERROR': 0, 'HIGH': 1,
+                       'WARNING': 2, 'MEDIUM': 2, 'LOW': 3, 'INFO': 4}
+          for lst in (sem_findings, gil_findings, tri_findings,
+                      tri_img_findings, ckv_findings):
+              lst.sort(key=lambda x: (sev_order.get(x['severity'], 9), x['id']))
+
+          all_findings = (sem_findings + gil_findings + tri_findings +
+                          tri_img_findings + ckv_findings)
+
+          sem_ok = sem is not None
+          gil_ok = isinstance(gil, list)
+          tri_ok = tri is not None
+          tri_img_ok = tri_img is not None
+          ckv_ok = isinstance(ckv, dict)
+          scanners = [
+              ('Semgrep (SAST)', sem_ok),
+              ('Gitleaks (secrets)', gil_ok),
+              ('Trivy (deps / misconfig)', tri_ok),
+              ('Trivy (container image)', tri_img_ok),
+              ('Checkov (IaC)', ckv_ok),
+          ]
+          all_ok = all(ok for _, ok in scanners)
+
+          now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+          total = len(all_findings)
+
+          def md_table(headers, rows):
+              if not rows:
+                  return '_No findings._'
+              out = ['| ' + ' | '.join(headers) + ' |',
+                     '|' + '|'.join('---' for _ in headers) + '|']
+              for row in rows:
+                  out.append('| ' + ' | '.join(esc(row.get(h, '')) for h in headers) + ' |')
+              return '\n'.join(out)
+
+          repo = os.environ.get('GITHUB_REPOSITORY', '')
+          branch = os.environ.get('GITHUB_REF_NAME', '')
+          commit = os.environ.get('GITHUB_SHA', '')
+          event = os.environ.get('GITHUB_EVENT_NAME', '')
+
+          report = []
+          report.append('# Security Scan Report')
+          report.append('')
+          report.append('**Repository:** `%s`' % repo)
+          report.append('')
+          report.append('**Branch:** `%s`' % branch)
+          report.append('')
+          report.append('**Commit:** `%s`' % commit)
+          report.append('')
+          report.append('**Event:** `%s`' % event)
+          report.append('')
+          report.append('**Scan time:** `%s`' % now)
+          report.append('')
+          report.append('> Non-blocking scan: findings do **not** fail the build or block deployment.')
+          report.append('')
+          report.append('## Scanner status')
+          report.append('')
+          report.append('| Scanner | Status |')
+          report.append('| --- | --- |')
+          for name, ok in scanners:
+              report.append('| %s | %s |' % (name, 'ran' if ok else 'NO OUTPUT - scan failed or was skipped'))
+          report.append('')
+          if not all_ok:
+              report.append('> **WARNING:** one or more scanners did not produce results. Do **not** treat this as a clean bill of health - review the workflow run logs.')
+              report.append('')
+          report.append('## Summary')
+          report.append('')
+          report.append('| Tool | High-impact findings |')
+          report.append('| --- | --- |')
+          report.append('| Semgrep (SAST) | %d |' % len(sem_findings))
+          report.append('| Gitleaks (secrets) | %d |' % len(gil_findings))
+          report.append('| Trivy (deps / misconfig) | %d |' % len(tri_findings))
+          report.append('| Trivy (container image) | %d |' % len(tri_img_findings))
+          report.append('| Checkov (IaC) | %d |' % len(ckv_findings))
+          report.append('| **Total** | **%d** |' % total)
+          report.append('')
+          report.append('## Semgrep (SAST, ERROR severity only)')
+          report.append('')
+          report.append(md_table(['severity', 'id', 'file', 'line', 'cwe', 'message'], sem_findings))
+          report.append('')
+          report.append('## Gitleaks (secrets)')
+          report.append('')
+          report.append('> Secret values are masked below. Full values stay in `gitleaks.json` (artifact) for triage.')
+          report.append('')
+          report.append(md_table(['severity', 'id', 'file', 'line', 'message', 'secret'], gil_findings))
+          report.append('')
+          report.append('## Trivy (dependencies & configuration, HIGH/CRITICAL)')
+          report.append('')
+          report.append(md_table(['severity', 'id', 'file', 'pkg', 'installed', 'fix', 'message'], tri_findings))
+          report.append('')
+          report.append('## Trivy (container image, HIGH/CRITICAL)')
+          report.append('')
+          report.append(md_table(['severity', 'id', 'file', 'pkg', 'installed', 'fix', 'message'], tri_img_findings))
+          report.append('')
+          report.append('## Checkov (IaC, HIGH/CRITICAL)')
+          report.append('')
+          report.append(md_table(['severity', 'id', 'file', 'line', 'message', 'link'], ckv_findings))
+          report.append('')
+
+          md = '\n'.join(report)
+          with open('security-report.md', 'w', encoding='utf-8') as f:
+              f.write(md)
+
+          summary_path = os.environ.get('GITHUB_STEP_SUMMARY')
+          if summary_path:
+              with open(summary_path, 'a', encoding='utf-8') as f:
+                  f.write(md)
+
+          with open('counts.txt', 'w') as f:
+              f.write('SEMGREP=%d GITLEAKS=%d TRIVY=%d TRIVY_IMAGE=%d CHECKOV=%d\n' % (
+                  len(sem_findings), len(gil_findings), len(tri_findings),
+                  len(tri_img_findings), len(ckv_findings)))
+
+          # ------------------------------------------------------------------
+          # Modern HTML report (self-contained: no external assets, no tracking)
+          # ------------------------------------------------------------------
+          def h(v):
+              return html.escape(str(v), quote=True)
+
+          def sev_cls(sev):
+              if sev in ('CRITICAL', 'ERROR'):
+                  return 'critical'
+              if sev == 'HIGH':
+                  return 'high'
+              if sev in ('MEDIUM', 'WARNING'):
+                  return 'medium'
+              if sev in ('LOW', 'INFO'):
+                  return 'low'
+              return 'other'
+
+          def badge(sev):
+              return '<span class="badge %s">%s</span>' % (sev_cls(sev), h(sev))
+
+          def html_row(f):
+              loc = h(f['file']) + ((':%s' % h(f['line'])) if f['line'] else '')
+              detail = h(f['message'])
+              if f['pkg']:
+                  detail += '<br><code>%s %s</code>' % (h(f['pkg']), h(f['installed']))
+              if f['cwe']:
+                  detail += '<br><span class="muted">CWEs: %s</span>' % h(f['cwe'])
+              if f['secret']:
+                  detail += '<br><span class="muted">Secret: <code>%s</code></span>' % h(f['secret'])
+              fid = h(f['id'])
+              if f['link']:
+                  fid = '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>' % (h(f['link']), fid)
+              if f['fix']:
+                  fixh = h(f['fix'])
+              elif f['link']:
+                  fixh = '<a href="%s" target="_blank" rel="noopener noreferrer">View rule &amp; remediation</a>' % h(f['link'])
+              else:
+                  fixh = ''
+              return ('<tr data-sev="%s">'
+                      '<td>%s</td>'
+                      '<td class="mono">%s</td>'
+                      '<td class="mono">%s</td>'
+                      '<td>%s</td>'
+                      '<td class="fix">%s</td></tr>') % (sev_cls(f['severity']), badge(f['severity']), fid, loc, detail, fixh)
+
+          def html_rows(finds):
+              if not finds:
+                  return '<tr class="empty"><td colspan="5">No HIGH/CRITICAL findings.</td></tr>'
+              return '\n'.join(html_row(f) for f in finds)
+
+          def tool_section(title, finds):
+              return ('<div class="card"><h2>%s<span class="count">%d</span></h2>'
+                      '<div style="overflow-x:auto"><table><thead><tr>'
+                      '<th>Severity</th><th>Finding</th><th>Location</th><th>Details</th><th>How to fix</th>'
+                      '</tr></thead><tbody>%s</tbody></table></div></div>') % (h(title), len(finds), html_rows(finds))
+
+          chips = ''.join('<span class="chip %s">%s</span>' % ('ok' if ok else 'fail', h(name)) for name, ok in scanners)
+          warn = ('<div class="warn">WARNING: one or more scanners produced no output. Do not treat this as a clean bill of health - review the workflow run logs.</div>' if not all_ok else '')
+
+          def tool_stats(tool, finds):
+              worst = ('critical' if any(f['severity'] in ('CRITICAL', 'ERROR') for f in finds)
+                       else 'high' if any(f['severity'] == 'HIGH' for f in finds)
+                       else '')
+              return '<div class="stat"><div class="n %s">%d</div><div class="l">%s</div></div>' % (worst, len(finds), h(tool))
+
+          stats = ''
+          for name, lst in [('Semgrep (SAST)', sem_findings),
+                            ('Gitleaks (secrets)', gil_findings),
+                            ('Trivy (deps / misconfig)', tri_findings),
+                            ('Trivy (container image)', tri_img_findings),
+                            ('Checkov (IaC)', ckv_findings)]:
+              stats += tool_stats(name, lst)
+          worst_total = ('critical' if any(f['severity'] in ('CRITICAL', 'ERROR') for f in all_findings)
+                         else 'high' if any(f['severity'] == 'HIGH' for f in all_findings)
+                         else '')
+          stats += '<div class="stat"><div class="n %s">%d</div><div class="l">Total</div></div>' % (worst_total, total)
+
+          sections = ''
+          sections += tool_section('Semgrep (SAST) - ERROR severity only', sem_findings)
+          sections += tool_section('Gitleaks (secrets)', gil_findings)
+          sections += tool_section('Trivy (dependencies & configuration) - HIGH/CRITICAL', tri_findings)
+          sections += tool_section('Trivy (container image) - HIGH/CRITICAL', tri_img_findings)
+          sections += tool_section('Checkov (IaC - Dockerfile & GitHub Actions) - HIGH/CRITICAL', ckv_findings)
+
+          CSS = """
+          :root{--bg:#f4f6fb;--card:#fff;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb}
+          *{box-sizing:border-box}
+          body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+          .topbar{background:#111827;color:#fff;padding:22px 0 18px}
+          .topbar .wrap{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+          h1{font-size:20px;margin:0;font-weight:700}
+          .meta{color:#9ca3af;font-size:12px}
+          .meta b{color:#e5e7eb}
+          .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+          main.wrap{padding-top:24px;padding-bottom:48px}
+          .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+          h2{font-size:15px;margin:0 0 12px}
+          h2 .count{background:#eef2ff;color:#4338ca;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px}
+          .chips{display:flex;gap:8px;flex-wrap:wrap}
+          .chip{font-size:12px;font-weight:600;padding:6px 12px;border-radius:999px}
+          .chip.ok{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+          .chip.fail{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+          .warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:12px}
+          .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+          .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+          .stat .n{font-size:26px;font-weight:800}
+          .stat .n.critical{color:#b91c1c}.stat .n.high{color:#ea580c}
+          .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:4px}
+          .controls{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+          #search{flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;outline:none}
+          #search:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+          .fbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted)}
+          .fbtn.active{background:#111827;color:#fff;border-color:#111827}
+          table{width:100%;border-collapse:collapse;font-size:13px}
+          th{text-align:left;background:#f9fafb;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+          td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+          tr:hover td{background:#fafbff}
+          .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all}
+          .badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}
+          .badge.critical{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+          .badge.high{background:#fff7ed;color:#ea580c;border:1px solid #fed7aa}
+          .badge.medium{background:#fffbeb;color:#a16207;border:1px solid #fde68a}
+          .badge.low,.badge.other{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+          td a{color:#4338ca;text-decoration:none;font-weight:600}
+          td a:hover{text-decoration:underline}
+          .fix{color:#065f46}
+          .muted{color:var(--muted);font-size:12px}
+          code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:1px 5px;font-size:12px}
+          .empty td{color:var(--muted);text-align:center;padding:22px}
+          footer{color:var(--muted);font-size:12px;text-align:center;padding:0 0 30px}
+          """
+
+          JS = """
+          (function(){
+            var sev='all', q='';
+            var rows=Array.prototype.slice.call(document.querySelectorAll('table tbody tr'));
+            function apply(){
+              rows.forEach(function(r){
+                var okSev = sev==='all' || r.getAttribute('data-sev')===sev;
+                var okQ = q==='' || r.textContent.toLowerCase().indexOf(q)!==-1;
+                r.style.display = (okSev && okQ) ? '' : 'none';
+              });
+            }
+            var btns=document.querySelectorAll('.fbtn');
+            btns.forEach(function(b){
+              b.addEventListener('click', function(){
+                sev=b.getAttribute('data-sev');
+                btns.forEach(function(x){ x.classList.toggle('active', x===b); });
+                apply();
+              });
+            });
+            document.getElementById('search').addEventListener('input', function(e){
+              q=e.target.value.toLowerCase(); apply();
+            });
+          })();
+          """
+
+          page = """<!DOCTYPE html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Security Scan Report - %s</title>
+          <style>%s</style>
+          </head>
+          <body>
+          <header class="topbar"><div class="wrap">
+            <h1>Security Scan Report</h1>
+            <div class="meta"><b>%s</b> &middot; branch <b>%s</b> &middot; commit <b>%s</b> &middot; %s &middot; %s</div>
+          </div></header>
+          <main class="wrap">
+            <div class="card"><h2>Scanner status</h2><div class="chips">%s</div>%s</div>
+            <div class="stats">%s</div>
+            <div class="card">
+              <div class="controls">
+                <input id="search" type="text" placeholder="Search findings by rule, CVE, file, package...">
+                <button class="fbtn active" data-sev="all">All</button>
+                <button class="fbtn" data-sev="critical">Critical</button>
+                <button class="fbtn" data-sev="high">High</button>
+                <button class="fbtn" data-sev="medium">Medium</button>
+                <button class="fbtn" data-sev="low">Low</button>
+              </div>
+            </div>
+            %s
+          </main>
+          <footer>Generated by the Security Scan workflow &middot; non-blocking, does not affect deployments &middot; %s</footer>
+          <script>%s</script>
+          </body>
+          </html>""" % (h(repo), CSS, h(repo), h(branch), h(commit[:7]), h(event), h(now), chips, warn, stats, sections, h(now), JS)
+
+          with open('security-report.html', 'w', encoding='utf-8') as f:
+              f.write(page)
+
+          print('Semgrep: %d | Gitleaks: %d | Trivy: %d | Trivy-image: %d | Checkov: %d' % (
+              len(sem_findings), len(gil_findings), len(tri_findings),
+              len(tri_img_findings), len(ckv_findings)))
+          PY
+
+      - name: Upload report artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-report
+          path: |
+            security-report.md
+            security-report.html
+            semgrep.json
+            gitleaks.json
+            trivy.json
+            trivy-image.json
+            checkov.json
+            semgrep.sarif
+            gitleaks.sarif
+            trivy.sarif
+            checkov.sarif
+            trivy-image.sarif
+          retention-days: 90
+          if-no-files-found: warn
+
+      # ------------------------------------------------------------------
+      # Sync findings to GitHub Issues - default branch only. Opens one
+      # issue per finding (labels + severity), auto-closes when a finding
+      # is fixed, reopens if it regresses. Opening/closing issues notifies
+      # repo watchers. Requires only `issues: write`.
+      # ------------------------------------------------------------------
+      - name: Sync findings to GitHub Issues
+        if: always() && github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            const readJSON = (p) => {
+              try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return null; }
+            };
+
+            // ---- Gather findings from the five reports ----
+            const findings = [];
+            const markersByTool = { semgrep: new Set(), gitleaks: new Set(), trivy: new Set(), 'trivy-image': new Set(), checkov: new Set() };
+            const toolsRan = { semgrep: false, gitleaks: false, trivy: false, 'trivy-image': false, checkov: false };
+
+            const addFinding = (tool, marker, title, severity, body) => {
+              findings.push({ tool, marker, title, severity, body });
+              markersByTool[tool].add(marker);
+            };
+
+            const sem = readJSON('semgrep.json');
+            if (sem && Array.isArray(sem.results)) {
+              toolsRan.semgrep = true;
+              for (const r of sem.results) {
+                const path = r.path || '';
+                const rule = r.check_id || 'semgrep';
+                addFinding(
+                  'semgrep',
+                  `semgrep:${rule}:${path}`,
+                  `[security] ${rule} in ${path}`,
+                  'high',
+                  `**Tool:** Semgrep (SAST)\n**Rule:** \`${rule}\`\n**File:** \`${path}\`\n**Line:** ${(r.start || {}).line || ''}\n\n${(r.extra || {}).message || ''}`
+                );
+              }
+            }
+
+            const gil = readJSON('gitleaks.json');
+            if (Array.isArray(gil)) {
+              toolsRan.gitleaks = true;
+              for (const r of gil) {
+                const file = r.File || '';
+                const rule = r.RuleID || 'gitleaks';
+                addFinding(
+                  'gitleaks',
+                  `gitleaks:${rule}:${file}`,
+                  `[security] Leaked secret (${rule}) in ${file}`,
+                  'critical',
+                  `**Tool:** Gitleaks (secrets)\n**Rule:** \`${rule}\`\n**File:** \`${file}\`\n**Line:** ${r.StartLine || ''}\n\n${r.Description || ''}`
+                );
+              }
+            }
+
+            const tri = readJSON('trivy.json');
+            if (tri && Array.isArray(tri.Results)) {
+              toolsRan.trivy = true;
+              for (const res of tri.Results) {
+                const target = res.Target || '';
+                for (const v of res.Vulnerabilities || []) {
+                  const sev = (v.Severity || '').toUpperCase() === 'CRITICAL' ? 'critical' : 'high';
+                  addFinding(
+                    'trivy',
+                    `trivy:${v.VulnerabilityID}:${target}`,
+                    `[security] ${v.VulnerabilityID} (${v.Severity}) in ${target}`,
+                    sev,
+                    `**Tool:** Trivy (dependencies)\n**CVE:** \`${v.VulnerabilityID}\`\n**Package:** ${v.PkgName || ''} ${v.InstalledVersion || ''}\n**Fixed in:** ${v.FixedVersion || 'N/A'}\n**Target:** \`${target}\`\n\n${v.Title || ''}`
+                  );
+                }
+                for (const m of res.Misconfigurations || []) {
+                  const sev = (m.Severity || '').toUpperCase() === 'CRITICAL' ? 'critical' : 'high';
+                  addFinding(
+                    'trivy',
+                    `trivy:${m.ID}:${target}`,
+                    `[security] ${m.ID} (${m.Severity}) in ${target}`,
+                    sev,
+                    `**Tool:** Trivy (misconfig)\n**Check:** \`${m.ID}\`\n**Target:** \`${target}\`\n\n${m.Title || m.Description || ''}`
+                  );
+                }
+              }
+            }
+
+            const triImg = readJSON('trivy-image.json');
+            if (triImg && Array.isArray(triImg.Results)) {
+              toolsRan['trivy-image'] = true;
+              for (const res of triImg.Results) {
+                const target = res.Target || '';
+                for (const v of res.Vulnerabilities || []) {
+                  const sev = (v.Severity || '').toUpperCase() === 'CRITICAL' ? 'critical' : 'high';
+                  addFinding(
+                    'trivy-image',
+                    `trivy-image:${v.VulnerabilityID}:${target}`,
+                    `[security] ${v.VulnerabilityID} (${v.Severity}) in container image ${target}`,
+                    sev,
+                    `**Tool:** Trivy (container image)\n**CVE:** \`${v.VulnerabilityID}\`\n**Package:** ${v.PkgName || ''} ${v.InstalledVersion || ''}\n**Fixed in:** ${v.FixedVersion || 'N/A'}\n**Image layer:** \`${target}\`\n\n${v.Title || ''}`
+                  );
+                }
+              }
+            }
+
+            const ckv = readJSON('checkov.json');
+            if (ckv && typeof ckv === 'object') {
+              toolsRan.checkov = true;
+              for (const section of Object.values(ckv)) {
+                if (!section || typeof section !== 'object') continue;
+                const failed = ((section.results || {}).failed_checks) || [];
+                for (const c of failed) {
+                  if (((c.check_result || {}).result || '') !== 'FAILED') continue;
+                  const sevRaw = (c.severity || 'MEDIUM').toUpperCase();
+                  if (sevRaw !== 'CRITICAL' && sevRaw !== 'HIGH') continue;
+                  const file = (c.file_path || '').replace(/^\//, '');
+                  const lineRange = c.file_line_range || [];
+                  addFinding(
+                    'checkov',
+                    `checkov:${c.check_id}:${file}`,
+                    `[security] ${c.check_id} (${sevRaw}) in ${file}`,
+                    sevRaw === 'CRITICAL' ? 'critical' : 'high',
+                    `**Tool:** Checkov (IaC)\n**Check:** \`${c.check_id}\`\n**File:** \`${file}\`\n**Line:** ${lineRange[0] || ''}\n\n${c.check_name || ''}\n\nGuideline: ${c.guideline || 'N/A'}`
+                  );
+                }
+              }
+            }
+
+            // ---- Ensure labels exist (best-effort) ----
+            const labelDefs = {
+              'security':            { color: 'd73a4a', description: 'Managed by the security scan workflow' },
+              'severity:critical':   { color: 'b60205', description: 'Critical severity security finding' },
+              'severity:high':       { color: 'd93f0b', description: 'High severity security finding' },
+              'auto-closed':         { color: 'c5def5', description: 'Closed automatically by the security scan workflow' },
+            };
+            const { owner, repo } = context.repo;
+            for (const [name, def] of Object.entries(labelDefs)) {
+              try {
+                await github.rest.labels.create({ owner, repo, name, color: def.color, description: def.description });
+              } catch (e) {
+                // label already exists - fine
+              }
+            }
+
+            const sevLabels = { critical: ['severity:critical'], high: ['severity:high'] };
+            const allSevLabels = ['severity:critical', 'severity:high'];
+
+            // ---- Load existing security issues (open and closed) ----
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'all', labels: 'security', per_page: 100,
+            });
+
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const refName = process.env.GITHUB_REF_NAME || '';
+
+            const issuesByMarker = new Map();
+            for (const issue of existing) {
+              if (issue.pull_request) continue;
+              if (issue.body && issue.body.includes('SEC-SCAN-MARKER')) {
+                const m = issue.body.match(/SEC-SCAN-MARKER: ([^\s]+)/);
+                if (m) issuesByMarker.set(m[1], issue);
+              }
+            }
+
+            let created = 0, updated = 0, closed = 0, reopened = 0;
+
+            for (const f of findings) {
+              const issue = issuesByMarker.get(f.marker);
+              const wantLabels = ['security', ...sevLabels[f.severity]];
+              if (!issue) {
+                const body = `${f.body}\n\n---\n\n_Created automatically by the [security scan workflow](${runUrl}) on \`${refName}\`. Fix the finding and this issue will close automatically once it is no longer detected. Full details in the \`security-scan-report\` artifact of that run._\n\n<!-- SEC-SCAN-MARKER: ${f.marker} -->`;
+                await github.rest.issues.create({ owner, repo, title: f.title, body, labels: wantLabels });
+                created++;
+                continue;
+              }
+              // Reconcile labels on existing issues
+              const currentLabels = (issue.labels || []).map(l => l.name);
+              const add = wantLabels.filter(l => !currentLabels.includes(l));
+              if (add.length) {
+                await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: add });
+                updated++;
+              }
+              const remove = allSevLabels.filter(l => !wantLabels.includes(l) && currentLabels.includes(l));
+              for (const l of remove) {
+                try { await github.rest.issues.removeLabel({ owner, repo, issue_number: issue.number, name: l }); } catch (e) {}
+              }
+              if (issue.state === 'closed') {
+                const wasAutoClosed = (issue.labels || []).some(l => l.name === 'auto-closed');
+                if (wasAutoClosed) {
+                  await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'open' });
+                  try { await github.rest.issues.removeLabel({ owner, repo, issue_number: issue.number, name: 'auto-closed' }); } catch (e) {}
+                  await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: `Reopened automatically: the finding was detected again on \`${refName}\`.` });
+                  reopened++;
+                }
+                // human-closed issues stay closed (decision respected)
+              }
+            }
+
+            // ---- Close stale issues (finding no longer present) ----
+            const toolFromMarker = (marker) => marker.split(':')[0];
+            for (const [marker, issue] of issuesByMarker) {
+              if (issue.pull_request) continue;
+              const tool = toolFromMarker(marker);
+              if (!toolsRan[tool]) continue;              // scanner didn't run - leave alone
+              if (markersByTool[tool].has(marker)) continue; // still present - handled above
+              if (issue.state === 'open') {
+                await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+                try { await github.rest.issues.addLabels({ owner, repo, issue_number: issue.number, labels: ['auto-closed'] }); } catch (e) {}
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: `Auto-closed: no longer detected on \`${refName}\`. It will be reopened automatically if it reappears.` });
+                closed++;
+              }
+            }
+
+            console.log(`Issue sync: ${findings.length} findings | created=${created} updated=${updated} reopened=${reopened} closed=${closed}`);
+
+      # ------------------------------------------------------------------
+      # Post / update a concise summary on the PR (only when findings exist)
+      # ------------------------------------------------------------------
+      - name: Post PR security summary
+        if: always() && github.event_name == 'pull_request' && !github.event.pull_request.draft && !github.event.pull_request.head.repo.fork
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let s = 0, g = 0, t = 0, ti = 0, c = 0;
+            if (fs.existsSync('counts.txt')) {
+              const raw = fs.readFileSync('counts.txt', 'utf8').trim();
+              for (const part of raw.split(/\s+/)) {
+                const [k, v] = part.split('=');
+                if (k === 'SEMGREP') s = parseInt(v, 10) || 0;
+                if (k === 'GITLEAKS') g = parseInt(v, 10) || 0;
+                if (k === 'TRIVY') t = parseInt(v, 10) || 0;
+                if (k === 'TRIVY_IMAGE') ti = parseInt(v, 10) || 0;
+                if (k === 'CHECKOV') c = parseInt(v, 10) || 0;
+              }
+            }
+            const total = s + g + t + ti + c;
+            const marker = '<!-- SECURITY-SCAN-REPORT -->';
+            const { owner, repo } = context.repo;
+            const list = await github.rest.issues.listComments({ owner, repo, issue_number: context.issue.number });
+            const existing = list.data.find(c => c.body && c.body.includes(marker));
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const refName = process.env.GITHUB_REF_NAME || '';
+            const sha7 = context.sha.slice(0, 7);
+
+            if (total === 0) {
+              if (existing) {
+                await github.rest.issues.deleteComment({ owner, repo, comment_id: existing.id });
+              }
+              return;
+            }
+
+            const body = `## Security Scan Summary\n\nAutomated non-blocking security scan on \`${refName}\` @ \`${sha7}\`.\n\n| Tool | High-impact findings |\n| --- | --- |\n| Semgrep (SAST) | ${s} |\n| Gitleaks (secrets) | ${g} |\n| Trivy (deps / misconfig) | ${t} |\n| Trivy (container image) | ${ti} |\n| Checkov (IaC) | ${c} |\n| **Total** | **${total}** |\n\n> This scan never blocks merge or deployment. Full details in the [workflow run](${runUrl}) or the \`security-scan-report\` artifact.\n\n${marker}`;
+
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: context.issue.number, body });
+            }
