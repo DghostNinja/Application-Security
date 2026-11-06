@@ -21,7 +21,7 @@ Replace every placeholder below with **your own values** before running anything
 | 3 | `avd/full_flow.py` | `ACTIVITY = "com.example.yourapp.MainActivity"` → your launcher activity | |
 | 4 | `memu/full_flow.py` | `PKG`, `SPAWN_ID`, `ACTIVITY` → same three values as above | |
 | 5 | `avd/setup_frida.sh` | `FRIDA_SERVER="$HOME/Tools/frida-server"` → path to your `frida-server` binary | |
-| 6 | `avd/setup_frida.bat` | `C:\Users\Shondels\Downloads\Tools\AVD\frida-server` → path to your `frida-server` binary | |
+| 6 | `avd/setup_frida.bat` | `%USERPROFILE%\Downloads\Tools\AVD\frida-server` → path to your `frida-server` binary | |
 
 Find your values with:
 
