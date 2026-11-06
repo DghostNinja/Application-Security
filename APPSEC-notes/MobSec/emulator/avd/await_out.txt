@@ -1,0 +1,15 @@
+Waiting for spawn to appear...
+Handling: Spawn(pid=8666, identifier="com.sterlingng.sterlingmobile")
+Spawned `com.sterlingng.sterlingmobile`. Resuming main thread!
+[BYPASS] installing...
+[BYPASS] hooked Gh/b.b
+[BYPASS] hooked Gh/b.a
+[BYPASS] hooked File.exists
+[BYPASS] hooked PackageManager
+[BYPASS] hooked A/J0
+[BYPASS] hooked Ve/b
+[BYPASS] ALL HOOKS INSTALLED (minimal — no Build spoof)
+[BYPASS] getSecurityReport — sanitizing
+[BYPASS] Gh/b.b() [root] -> false
+[BYPASS] Gh/b.a() [clone] -> false
+[BYPASS]  sanitized: {platform=android, packageName=com.sterlingng.sterlingmobile, appSignature=83D227A2264DD75365BCDFD3A0F0DBE88A7A3D44D06BF4B2D1B83887A131D766, installerPackageName=com.android.vending, rootedOrJailbroken=false, devModeEnabled=false, cloneEnvironmentDetected=false, processNameMismatch=false, hasTestKeys=false, isEmulator=false}
